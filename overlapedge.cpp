@@ -1,0 +1,32 @@
+#include <iostream>
+#include "CImg.h"
+//#include "Global.h"
+//#include "MathFunctions.h"
+#include "Commons.h"
+
+using namespace std;
+using namespace cimg_library;
+
+int main(int argc, char*argv[]){
+    string imagename(argv[1]);
+    string skeletonname(argv[2]);
+    string rgb_image_name=basepath+"overlapped-"+imagename;
+    imagename=basepath+imagename;
+    skeletonname=basepath+skeletonname;
+
+    CImg<unsigned short> jpgimage(imagename.c_str());
+    Xdim=jpgimage.width();
+    Ydim=jpgimage.height();
+    CImg<unsigned short>RGBimage(jpgimage.width(), jpgimage.height(), 1, 3, 0);
+    RGBimage=convert_to_RGB_image<unsigned short>(jpgimage);
+    CImg<unsigned short> skeljpgimage(skeletonname.c_str());
+    cimg_forXY(skeljpgimage,x,y){
+        if(skeljpgimage(x,y)>1){
+            RGBimage(x,y,0,0)=atoi(argv[3]);
+            RGBimage(x,y,0,1)=atoi(argv[4]);
+            RGBimage(x,y,0,2)=atoi(argv[5]);
+        }
+    }
+    RGBimage.save_tiff(rgb_image_name.c_str());
+    RGBimage.display();
+}

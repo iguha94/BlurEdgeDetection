@@ -1,0 +1,132 @@
+#ifndef COMPUTESCALE_H
+#define COMPUTESCALE_H
+#include <iostream>
+#include<math.h>
+#include <cmath>
+#include <algorithm>
+#include "MathFunctions.h"
+#include "Global.h"
+#include "Commons.h"
+#include "ComputeGradient.h"
+
+using namespace std;
+
+double totalgrad=0;
+double HomogeneityFunc(double GH , double GL) {
+    return GH<GL?GL:GH;
+}
+
+void computeHomogeneity(unsigned short** arr,int xc, int yc, int x, int y,int Rows, int Cols,int r,int fno=0){
+    if(scaleMap.find(calculateIndex(x,y,Rows,Cols))!=scaleMap.end()) return;
+    computegaussGradient(arr,x,y,Rows,Cols,r);
+    double distance=CartesianDistance2D(xc,yc,x,y);
+    double weight=gaussian(r,distance,gaussvar);
+
+    Totalweight+=1;
+    cumulativeweight+=1;
+    TotalweightX+=GradientX[x][y];
+    TotalweightY+=GradientY[x][y];
+    
+    curgradX+=GradientX[x][y];
+    curgradY+=GradientY[x][y];
+    
+    Point p(x,y,weight);
+    weightvector.push_back(p);
+    scaleMap.insert(pair<long long int,bool>(calculateIndex(x,y,Rows,Cols),true));
+}
+
+
+void drawdiskPoints(unsigned short** arr, int r, int xc, int yc,int curx, int cury,int Rows,int Cols){
+
+    if(xc-curx>=0&&yc-cury>=0 &&arr[xc-curx][yc-cury]>=minIntensity && arr[xc][yc-cury]<=maxIntensity) {
+            computeHomogeneity(arr,xc,yc,xc-curx,yc-cury,Rows,Cols,r);
+    }
+    if(xc-curx>=0&& yc+cury<Cols && arr[xc-curx][yc+cury]>=minIntensity && arr[xc-curx][yc+cury]<=maxIntensity){
+            computeHomogeneity(arr,xc,yc,xc-curx,yc+cury,Rows,Cols,r);
+    }
+    if(xc+curx<Rows && yc-cury>=0 && arr[xc+curx][yc-cury]>=minIntensity &&  arr[xc+curx][yc-cury]<=maxIntensity){
+            computeHomogeneity(arr,xc,yc,xc+curx,yc-cury,Rows,Cols,r);
+    }
+    if(yc+cury<Cols&&xc+curx<Rows &&arr[xc+curx][yc+cury]>=minIntensity && arr[xc+curx][yc+cury]<=maxIntensity){
+            computeHomogeneity(arr,xc,yc,xc+curx,yc+cury,Rows,Cols,r);
+    }
+    if(xc-cury>=0&&yc-curx>=0 && arr[xc-cury][yc-curx]>=minIntensity && arr[xc-cury][yc-curx]<=maxIntensity) {
+            computeHomogeneity(arr,xc,yc,xc-cury,yc-curx,Rows,Cols,r);
+    }
+    if(yc-curx>=0 && xc+cury<Rows && arr[xc+cury][yc-curx]>=minIntensity && arr[xc+cury][yc-curx]<=maxIntensity){
+            computeHomogeneity(arr,xc,yc,xc+cury,yc-curx,Rows,Cols,r);
+    }
+    if(xc+cury<Rows&&yc+curx<Cols && arr[xc+cury][yc+curx]>=minIntensity && arr[xc+cury][yc+curx]<=maxIntensity){
+            computeHomogeneity(arr,xc,yc,xc+cury,yc+curx,Rows,Cols,r);
+    }
+    if(xc-cury>=0&&yc+curx<Cols && arr[xc-cury][yc+curx]>=minIntensity && arr[xc-cury][yc+curx]<=maxIntensity){
+            computeHomogeneity(arr,xc,yc,xc-cury,yc+curx,Rows,Cols,r);
+    }
+
+}
+
+void drawDisk(unsigned short** arr, int xc, int yc, int Rows, int Cols, int j){
+        int curx=0;
+        int cury=j;
+        int p=3-j*2;
+        drawdiskPoints(arr,j,xc,yc,curx,cury,Rows,Cols);
+        while(curx<cury){
+            curx++;
+            if(p<0){
+                p+=4*curx+6;
+            }
+            else{
+                p+=4*(curx-cury)+10;
+                cury--;
+            }
+            drawdiskPoints(arr,j,xc,yc,curx,cury,Rows,Cols);
+        }
+}
+
+
+void compute_scale_Gradient_with_interpolation(unsigned short** arr,int Rows, int Cols,bool isprint=false){
+    for(int i=0;i<Rows;i++){
+        for(int j=0;j<Cols;j++){
+            if(arr[i][j]>=minIntensity){
+                scaleMap.clear();
+                initgradientParams();
+                drawDisk(arr,i,j,Rows,Cols,0);
+                globalmeanX=TotalweightX/Totalweight;  
+                globalmeanY=TotalweightY/Totalweight; 
+                prevweight=cumulativeweight;
+                totalgradient=squareroot(curgradX,curgradY);
+                gradientImage[i][j]=totalgradient;
+                ReliableScale[i][j]=scale+1;
+                while(gradientvar<gradthreshold || totalgradient<gradienthresh){
+                    prevweight=cumulativeweight;
+                    gradientImage[i][j]=totalgradient;
+                    ReliableScale[i][j]=scale+1;
+                    initgradientParams();
+                    scale=scale+1;
+                    drawDisk(arr,i,j,Rows,Cols,scale);
+                    double gradvarx=computeVarianceX();
+                    double gradvary=computeVarianceY();
+                    gradientvar=sqrt(gradvarx+gradvary);
+                    totalgradient=squareroot(curgradX,curgradY);
+                    if(scale>=maxscale) break;
+                    gradthreshold=compute_threshold(scale);
+                    gradienthresh/=sqrt(2*3.14*scale);
+                }
+                
+                if(scale>1) {gradientImage[i][j]/=(prevweight);gradientImage[i][j]*=(scale);}
+                else {gradientImage[i][j]*=2;}
+                Gradientangle[i][j]=computeAngle(curgradX,curgradY);
+            }
+        }
+    }
+
+    CImg<unsigned short> scalejpgimage(Xdim,Ydim,1,1);
+    writeImage<double, unsigned short>(ReliableScale,Rows,Cols,scalejpgimage,scaleimagename);
+
+    CImg<unsigned short> gradientjpgimage(Xdim,Ydim,1,1);
+    writeImage<unsigned short, unsigned short>(gradientImage,Rows,Cols,gradientjpgimage,gradientimagename);
+    
+    gradient_color_Image(Gradientangle,gradientImage,gradientcolorimagename);
+ }
+
+#endif // COMPUTESCALE_H

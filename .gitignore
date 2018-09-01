@@ -3,3 +3,6 @@
 *.txt*
 *.bmp*
 *.cpp~
+*.o
+Makefile
+

@@ -5,6 +5,8 @@
 #include <map>
 #include <list>
 #include <fstream>
+#include <vector>
+#include <algorithm>
 
 #define ushrt unsigned short
 using namespace std;
@@ -88,9 +90,12 @@ double** kernelSX;
 double** kernelSY;
 double** kernelSXY;
 double** Dividorarr;
+double** Minarr;
 
 double** GradientX;
 double** GradientY;
+double** ScaleGradientX;
+double** ScaleGradientY;
 double** LocalMaxima;
 double** LocalMinima;
 double** Hysteresis;
@@ -165,7 +170,8 @@ string dividorimagename;
 string secondderivativeimagename;
 int maxscale;
 double ncount;
-
+vector<double> percentile;
+vector<double> spercentile;
 double butterworth_cutoff;
 double**** weight_gradient_matrix;
 int no_of_interpolating_points;

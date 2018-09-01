@@ -16,19 +16,22 @@ int main(int argc, char* argv[]) {
 
     string logfile=basepath+"log.txt";
     logger.open(logfile.c_str());
-    confidence=1.5*pow(10,-8);
-    memconf=confidence;
+    //confidence=1.5*pow(10,-8);
+    //memconf=confidence;
     bool b=false;
     gaussvar=1;
     int kernelsize=3;
     sampling_rate=6;
 
     string curimagefile(argv[1]);
-    kernelsize=atoi(argv[2]);
-    gaussgradvar=atof(argv[3]);
-    colorgaussvar=atof(argv[4]);
-    maxscale=atof(argv[5]);
-    snr=atof(argv[6]);
+    gaussgradvar=atof(argv[2]);
+    colorgaussvar=atof(argv[3]);
+    maxscale=atof(argv[4]);
+    snr=atof(argv[5]);
+
+    kernelsize=6*gaussgradvar;
+    if(kernelsize%2==0) kernelsize+=1;
+    kernelsize=kernelsize>3?kernelsize:3;
 
     //cout<<"Enter membership value: ";
     //cin>>memconf;
@@ -63,7 +66,6 @@ int main(int argc, char* argv[]) {
     Xdim=jpgimage.width();
     Ydim=jpgimage.height();
     cout<<"Image Size: "<<Xdim<< " X "<<Ydim<<"\n";
-    cout<<"base Confidence: "<<-log(confidence)<<endl;
     allocateMemory(Xdim,Ydim);
     allocateGradientImageMemory(Xdim,Ydim);
     initializeKernels(kernelsize);
@@ -73,6 +75,24 @@ int main(int argc, char* argv[]) {
     gradienthresh=6;
 
     compute_Gradient(image,Xdim,Ydim);
+    int flag=1;
+    double maxThreshold,minThreshold,threshold;
+
+    cout<<"*********************************\n";
+    cout<<"Localization using Canny's Method\n";
+    cout<<"*********************************\n";
+    while(flag==1){
+        cout<<"Enter Lower and Higher Hysteresis Threshold: ";
+        cin>>minThreshold>>maxThreshold;
+        cout<<"Enter Non maxima suppression threshhold: ";
+        cin>>threshold;
+        //NonmaximaSuppression<double,double>(gradImage,Gradientangle,threshold);
+        NonmaximaSuppression_Canny<double,double>(gradientImage,GradientX,GradientY,Gradientangle,threshold);
+        HysteresisThresholding(minThreshold,maxThreshold,localizedimagename);
+        cout<<"Press 0 to terminate else press 1. \n";
+        cin>>flag;
+    }
+    cout<<"Shutting Down Canny Edge and Starting Blur Edge Detection---\n";
     compute_scale_Gradient_with_continuous_interpolation(image,Xdim,Ydim,b);
     sout.close();
     logger.close();

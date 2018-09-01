@@ -23,37 +23,36 @@ void init_scale_params(){
 
 void drawCirclePoints(unsigned short** arr, int r, int xc, int yc, int curx, int cury, int Rows, int Cols)
 {
+
     if(xc - curx >= 0 && yc - cury >= 0 ) {
-        arr[xc-curx][yc-cury]+=ReliableScale[xc][yc];
-        countarr[xc-curx][yc-cury]++;
+        spercentile.push_back(arr[xc-curx][yc-cury]);
     }
     if(xc - curx >= 0 && yc + cury < Cols ) {
-        arr[xc - curx][yc + cury]+=ReliableScale[xc][yc];
-        countarr[xc - curx][yc + cury]++;
+        spercentile.push_back(arr[xc - curx][yc + cury]);
+        //if(<mingrad) mingrad=arr[xc - curx][yc + cury];
     }
     if(xc + curx < Rows && yc - cury >= 0 ) {
-        arr[xc + curx][yc - cury]+=ReliableScale[xc][yc];
-        countarr[xc + curx][yc - cury]++;
+        spercentile.push_back(arr[xc + curx][yc - cury]);
     }
     if(yc + cury < Cols && xc + curx < Rows) {
-        arr[xc + curx][yc + cury]+=ReliableScale[xc][yc];
-        countarr[xc + curx][yc + cury]++;
+        spercentile.push_back(arr[xc + curx][yc + cury]);
+        //if(<mingrad) mingrad=arr[xc + curx][yc + cury];
     }
     if(xc - cury >= 0 && yc - curx >= 0 ) {
-        arr[xc - cury][yc - curx]+=ReliableScale[xc][yc];
-        countarr[xc - cury][yc - curx]++;
+        spercentile.push_back(arr[xc - cury][yc - curx]);
+       // if(<mingrad) mingrad=arr[xc - cury][yc - curx];
     }
     if(yc - curx >= 0 && xc + cury < Rows) {
-        arr[xc + cury][yc - curx]+=ReliableScale[xc][yc];
-        countarr[xc + cury][yc - curx]++;
+        spercentile.push_back(arr[xc + cury][yc - curx]);
+        //if(<mingrad) mingrad=arr[xc + cury][yc - curx];
     }
     if(xc + cury < Rows && yc + curx < Cols ) {
-        arr[xc + cury][yc + curx]+=ReliableScale[xc][yc];
-        countarr[xc + cury][yc + curx]++;
+        spercentile.push_back(arr[xc + cury][yc + curx]);
+        //if(<mingrad) mingrad=arr[xc + cury][yc + curx];
     }
     if(xc - cury >= 0 && yc + curx < Cols ) {
-        arr[xc - cury][yc + curx]+=ReliableScale[xc][yc];
-        countarr[xc - cury][yc + curx]++;
+        spercentile.push_back(arr[xc - cury][yc + curx]);
+        //if(<mingrad) mingrad=arr[xc - cury][yc + curx];
     }
 }
 
@@ -75,18 +74,22 @@ void drawCircle(unsigned short** arr, int xc, int yc, int Rows, int Cols, int r)
     }
 }
 
-void DialateScale(){
+void DialateScale(int prcntile=25){
     for(int i=0;i<Xdim;i++){
         for(int j=0;j<Ydim;j++){
-            DialatedScale[i][j]=ReliableScale[i][j];
+            DialatedScale[i][j]=gradImage[i][j];
         }
     }
 
     for(int i=0;i<Xdim;i++){
         for(int j=0;j<Ydim;j++){
             ncount=0;
-            for(int k=1;k<ReliableScale[i][j]/2;k++)
-                drawCircle(DialatedScale,i,j,Xdim,Ydim,k);
+            spercentile.clear();
+            //for(int k=1;k<ReliableScale[i][j]/2;k++)
+            drawCircle(DialatedScale,i,j,Xdim,Ydim,ReliableScale[i][j]/2);
+            sort(spercentile.begin(),spercentile.end());
+            int index=(spercentile.size()+1)*(prcntile/100);
+            LocalMinima[i][j]=spercentile[index];
         }
 
     }
@@ -108,6 +111,22 @@ double getInterpolatedGradientX(double x, double y, int Rows, int Cols, int inde
     if(x3>=0 && x3<Rows && y4>=0 && y4<Cols){averageweight_X+=GradientX[x3][y4];++pcount;}
     if(pcount==0) return averageweight_X;
     return averageweight_X/pcount;
+}
+
+double getInterpolatedGradientY(double x, double y, int Rows, int Cols, int index){
+    int x1,y1,x2,y2,x3,y3,x4,y4;
+    double averageweight_Y=0;
+    x1=ceil(x); y1=ceil(y); //ceil(x), ceil(Y) -- Point 1 for interpolation
+    x2=ceil(x);y2=floor(y); //ceil(x),floor(y) -- Point 2 for interpolation
+    x3=floor(x);y3=ceil(y); //floor(x),ceil(y) -- Point 3 for interpolation
+    x4=floor(x);y4=floor(y); //floor(x),floor(y) -- Point 4 for interpolation
+    int pcount=0;
+    if(x1>=0 && x1<Rows && y1>=0 && y1<Cols){averageweight_Y+=GradientY[x1][y1];++pcount;}
+    if(x2>=0 && x2<Rows && y2>=0 && y2<Cols && index!=0 ){averageweight_Y+=GradientY[x2][y2];++pcount;}
+    if(x3>=0 && x3<Rows && y3>=0 && y3<Cols && index!=2 ){averageweight_Y+=GradientY[x3][y3];++pcount;}
+    if(x4>=0 && x4<Rows && y4>=0 && y4<Cols){averageweight_Y+=GradientY[x4][y4];++pcount;}
+    if(pcount==0) return averageweight_Y;
+    return averageweight_Y/pcount;
 }
 
 double Bilinear_interpolationX( double x, double y){
@@ -132,22 +151,6 @@ double Bilinear_interpolationX( double x, double y){
     if(coeff!=1) cout<<"Coefficient: "<<coeff<<"\n"; //should be one if calculation is correct
     if(val==0) return GradientX[x1][y1];
     else return val;
-}
-
-double getInterpolatedGradientY(double x, double y, int Rows, int Cols, int index){
-    int x1,y1,x2,y2,x3,y3,x4,y4;
-    double averageweight_Y=0;
-    x1=ceil(x); y1=ceil(y); //ceil(x), ceil(Y) -- Point 1 for interpolation
-    x2=ceil(x);y2=floor(y); //ceil(x),floor(y) -- Point 2 for interpolation
-    x3=floor(x);y3=ceil(y); //floor(x),ceil(y) -- Point 3 for interpolation
-    x4=floor(x);y4=floor(y); //floor(x),floor(y) -- Point 4 for interpolation
-    int pcount=0;
-    if(x1>=0 && x1<Rows && y1>=0 && y1<Cols){averageweight_Y+=GradientY[x1][y1];++pcount;}
-    if(x2>=0 && x2<Rows && y2>=0 && y2<Cols && index!=0 ){averageweight_Y+=GradientY[x2][y2];++pcount;}
-    if(x3>=0 && x3<Rows && y3>=0 && y3<Cols && index!=2 ){averageweight_Y+=GradientY[x3][y3];++pcount;}
-    if(x4>=0 && x4<Rows && y4>=0 && y4<Cols){averageweight_Y+=GradientY[x4][y4];++pcount;}
-    if(pcount==0) return averageweight_Y;
-    return averageweight_Y/pcount;
 }
 
 double Bilinear_interpolationY( double x, double y){
@@ -176,43 +179,38 @@ double Bilinear_interpolationY( double x, double y){
 
 void updateParameters(int r,double weight,int index){
     pointsunderarea+=1;
-    TotalweightX+=weight*weight_gradient_matrix[r][totalpoints][index][0];
-    TotalweightY+= weight*weight_gradient_matrix[r][totalpoints][index][1];
-    curgradX+=weight*weight_gradient_matrix[r][totalpoints][index][0];
-    curgradY+=weight*weight_gradient_matrix[r][totalpoints][index][1];
+    TotalweightX+=(weight*weight_gradient_matrix[r][totalpoints][index][0]);
+    TotalweightY+=( weight*weight_gradient_matrix[r][totalpoints][index][1]);
+    curgradX+=(weight*weight_gradient_matrix[r][totalpoints][index][0]);
+    curgradY+=(weight*weight_gradient_matrix[r][totalpoints][index][1]);
     Totalweight+=weight;
 }
 
+
 void draw_continuous_scale(unsigned short** arr, int xc, int yc, int Rows, int Cols, double r){
-    double curx0,curx1,curx2; //X coordinates for r-0.25, r, r+0.25 respectively
-    double cury0,cury1,cury2; //Y coordinates for r-0.25, r, r+0.25 respectively
-    double total_sample_points=r*sampling_rate; //total points on the scale
+    double curx0,curx1,curx2;
+    double cury0,cury1,cury2;
+    double total_sample_points=r*sampling_rate;
 
     for(int i=0;i<total_sample_points;i++){
-        double angle=(2*M_PI*i)/(total_sample_points); //angle for the point on the circle
+        double angle=(2*M_PI*i)/(total_sample_points);
 
-        curx0=xc+(r-0.25)*cos(angle); //X coordinate of the point on scale r-0.25
-        cury0=yc-(r-0.25)*sin(angle); //Y coordinate of the point on scale r-0.25
-        curx1=xc+r*cos(angle); //X coordinate of the point on scale r
-        cury1=yc-r*sin(angle); //Y coordinate of the point on scale r
-        curx2=xc+(r+0.25)*cos(angle); //X coordinate of the point on scale r+0.25
-        cury2=yc-(r+0.25)*sin(angle); //Y coordinate of the point on scale r+0.25
+        curx0=xc+(r-0.25)*cos(angle);
+        cury0=yc-(r-0.25)*sin(angle);
+        curx1=xc+r*cos(angle);
+        cury1=yc-r*sin(angle);
+        curx2=xc+(r+0.25)*cos(angle);
+        cury2=yc-(r+0.25)*sin(angle);
         int scale=2*r;
-        //weight_gradient_matrix[scale][totalpoints][0][0]=getInterpolatedGradientX(curx0,cury0, Rows, Cols,0); //interpolate gradientX at scale r-0.5
         weight_gradient_matrix[scale][totalpoints][0][0]=Bilinear_interpolationX(curx0,cury0);
-        //weight_gradient_matrix[scale][totalpoints][0][1]=getInterpolatedGradientY(curx0,cury0, Rows, Cols,0); //interpolate gradientY at scale r-0.5
         weight_gradient_matrix[scale][totalpoints][0][1]=Bilinear_interpolationY(curx0,cury0);
         updateParameters(scale,0.5,0);
 
-        //weight_gradient_matrix[scale][totalpoints][1][0]=getInterpolatedGradientX(curx1,cury1, Rows, Cols,1); //interpolate gradientX at scale r
         weight_gradient_matrix[scale][totalpoints][1][0]=Bilinear_interpolationX(curx1,cury1);
-        //weight_gradient_matrix[scale][totalpoints][1][1]=getInterpolatedGradientY(curx1,cury1, Rows, Cols,1); //interpolate gradientY at scale r
         weight_gradient_matrix[scale][totalpoints][1][1]=Bilinear_interpolationY(curx1,cury1);
         updateParameters(scale,1,1);
 
-        //weight_gradient_matrix[scale][totalpoints][2][0]=getInterpolatedGradientX(curx2,cury2, Rows, Cols,2); //interpolate gradientX at scale r+0.5
         weight_gradient_matrix[scale][totalpoints][2][0]=Bilinear_interpolationX(curx2,cury2);
-        //weight_gradient_matrix[scale][totalpoints][2][1]=getInterpolatedGradientY(curx2,cury2, Rows, Cols,2); //interpolate gradientY at scale r+0.5
         weight_gradient_matrix[scale][totalpoints][2][1]=Bilinear_interpolationY(curx2,cury2);
         updateParameters(scale,0.5,2);
 
@@ -221,8 +219,9 @@ void draw_continuous_scale(unsigned short** arr, int xc, int yc, int Rows, int C
         double gradYcomp=0.5*weight_gradient_matrix[scale][totalpoints][0][1]+weight_gradient_matrix[scale][totalpoints][1][1]
                 +0.5*weight_gradient_matrix[scale][totalpoints][2][1];
         double Gradmag=squareroot<double>(gradXcomp/2,gradYcomp/2);
+        percentile.push_back(Gradmag);
         curgrad+=Gradmag;
-
+        //if(Gradmag<minimumGradient) minimumGradient=Gradmag;
         // W        | if(xc==Xc && yc==Yc){
         // R        |   double avgx=weight_gradient_matrix[scale][totalpoints][0][0]+weight_gradient_matrix[scale][totalpoints][1][0]+weight_gradient_matrix[scale][totalpoints][2][0];
         // O        |   avgx/=3;
@@ -244,72 +243,76 @@ void compute_scale_Gradient_with_continuous_interpolation(unsigned short** arr,i
     fout.open(fname.c_str(),ios::app);
     for(int i=0;i<Rows;i++){
         for(int j=0;j<Cols;j++){
-            init_scale_params(); //initialize starting parameters
-            double scale=0;      //initialize scale
-            double gradthreshold=1; //initialize gradient threshold
-            totalpoints=1; //initialize number of boundary points
+            init_scale_params();
+            double scale=0;
+            double gradthreshold=1;
+            totalpoints=1;
             double prevcount=1;
-            TotalweightX=curgradX=GradientX[i][j]; //gradient and total gradient along X at scale 0
-            TotalweightY=curgradY=GradientY[i][j]; //gradient and total gradient along Y at scale 0
-            globalmeanX=TotalweightX/Totalweight; //mean at X direction for scale 0
-            globalmeanY=TotalweightY/Totalweight; //mean at Y direction for scale 0
-            totalgradient1=totalgradient=squareroot<double>(curgradX,curgradY); //compute total gradient at scale 0
-            double dividor=1;
+            TotalweightX=curgradX=GradientX[i][j];
+            TotalweightY=curgradY=GradientY[i][j];
+            globalmeanX=TotalweightX/Totalweight;
+            globalmeanY=TotalweightY/Totalweight;
+            totalgradient1=totalgradient=squareroot<double>(curgradX,curgradY);
+            double signal_to_noise_ratio=1;
+            Minarr[i][j]=0;
             while((gradientvar<gradthreshold) || (totalgradient)<gradienthresh){
+                percentile.clear();
+                minimumGradient=INT_MAX;
                 curgradX=curgradY=0;curgrad=0;
-                prevcount=pointsunderarea; //store total weight from scale
-                scale=scale+0.5; //increase scale by 0.5
-                totalpoints=0; //initialize number of boundary points for scale+1
-                gradImage[i][j]=totalgradient1; //store gradient magnitude from the previous scale
-                ReliableScale[i][j]=scale*2; //save scale
+                prevcount=pointsunderarea;
+                scale=scale+0.5;
+                totalpoints=0;
+                ScaleGradientX[i][j]=TotalweightX/2;
+                ScaleGradientY[i][j]=TotalweightY/2;
+                //gradImage[i][j]=totalgradient1;
+                gradImage[i][j]=totalgradient1;
+                ReliableScale[i][j]=scale*2;
                 if(scale>=maxscale) break;
-                draw_continuous_scale(arr,i,j,Rows,Cols,scale); //get points on the scale and compute weighted sum of gradients
-                int flag=1;          //1 flag implies use mean from previous scale
-                if(2*scale<=6) flag=0; //0 flag implies use mean from current scale
+                draw_continuous_scale(arr,i,j,Rows,Cols,scale);
+                Minarr[i][j]=GetLowerPercentile(percentile,10); //also compute the 50%-ile for scalebased gradientimage
+                int flag=1;
+                if(2*scale<=6) flag=0;
 
-                double varx=compute_variance_X_from_inner(2*scale,flag); //compute variance X
-                double vary=compute_variance_Y_from_inner(2*scale,flag); //compute variance Y
+                double varx=compute_variance_X_from_inner(2*scale,flag);
+                double vary=compute_variance_Y_from_inner(2*scale,flag);
 
                 double prevmean=squareroot<double>(globalmeanX,globalmeanY);
                 gradientvar=varx+vary;
-                if(gradientvar==0) dividor=prevmean;
-                else dividor=prevmean/sqrt(gradientvar);
-                gradthreshold=compute_threshold(totalpoints);//update variance threshold by sqrt(boundarypoints)
 
-                totalgradient1=squareroot<double>(TotalweightX/2,TotalweightY/2); //update total gradient
+                if(gradientvar==0) signal_to_noise_ratio=0;
+                else if(gradientvar<(1)) signal_to_noise_ratio=1;
+                else signal_to_noise_ratio=prevmean/sqrt(gradientvar);
+                signal_to_noise_ratio=1;
+
+                gradthreshold=compute_threshold(totalpoints);
+
+                totalgradient1=squareroot<double>(TotalweightX/2,TotalweightY/2);
                 totalgradient=curgrad/(snr*totalpoints);
-                gradienthresh/=sqrt(totalpoints); //update gradient threshold by sqrt(totalnumberofpoints)
+                gradienthresh/=sqrt(totalpoints);
+                //Minarr[i][j]=minimumGradient;
             }
-            if(minimumGradient<1) minimumGradient=1;
-            Dividorarr[i][j]=dividor*2*scale;
 
-            if(scale==0.5) {gradImage[i][j]/=(3);gradImage[i][j]*=(dividor*2*scale);}
-            else {gradImage[i][j]/=(prevcount);gradImage[i][j]*=(dividor*2*scale);} //calculate gradient if scale>1
-            Gradientangle[i][j]=computeAngle(TotalweightX/2,TotalweightY/2); //calculate the gradient angle
+            Dividorarr[i][j]=signal_to_noise_ratio*10;
+
+            if(scale==0.5) {gradImage[i][j]/=(3);gradImage[i][j]*=(signal_to_noise_ratio*2*scale);ScaleGradientX[i][j]*=2;ScaleGradientY[i][j]*=2;}
+            else { gradImage[i][j]/=(prevcount); gradImage[i][j]*=(signal_to_noise_ratio*2*scale);}
+            Gradientangle[i][j]=computeAngle(TotalweightX/2,TotalweightY/2);
         }
     }
 
-    DialateScale();
-    /*for(int i=0;i<Xdim;i++){
-        for(int j=0;j<Ydim;j++){
-            if(countarr[i][j]==0) countarr[i][j]=1;
-            double averageScale=(double)((double)(DialatedScale[i][j]/countarr[i][j]));
-            DialatedScale[i][j]/=countarr[i][j];
-            gradImage[i][j]*=averageScale;
-        }
-    }*/
+    DialateScale(10);
 
     /*if(usigned){
         CImg<unsigned short> scalejpgimage(Xdim,Ydim,1,1);
         writeImageunsigned<double, unsigned short>(ReliableScale,Rows,Cols,scalejpgimage,scaleimagename,true);
         writeImagefile<double>(gradientImage,Rows,Cols,gradientimagename);
     }*/
-    //else{
+
     CImg<unsigned short> scalejpgimage(Xdim,Ydim,1,1);
     writeImage<double, unsigned short>(ReliableScale,Rows,Cols,scalejpgimage,scaleimagename,true);
     CImg<long int> gradientjpgimage(Xdim,Ydim,1,1);
     writeImage<double, long int>(gradImage,Rows,Cols,gradientjpgimage,gradientimagename,true);
-    //}
+
     gradient_color_Image(Gradientangle,gradImage,gradientcolorimagename);
 
     CImg<unsigned short> dialatejpgimage(Xdim,Ydim,1,1);
@@ -330,23 +333,11 @@ void compute_scale_Gradient_with_continuous_interpolation(unsigned short** arr,i
         cout<<"Enter Non maxima suppression threshhold: ";
         cin>>threshold;
         NonmaximaSuppression<double,double>(gradImage,Gradientangle,threshold);
-        HysteresisThresholding(minThreshold,maxThreshold);
+        //NonmaximaSuppression_Canny<double,double>(gradImage,ScaleGradientX,ScaleGradientY,Gradientangle,threshold);
+        HysteresisThresholding(minThreshold,maxThreshold,Hysteresisimagename);
         cout<<"Press 0 to terminate else press 1. \n";
         cin>>flag;
     }
-
-    /*flag=1;
-    cout<<"*********************************\n";
-    cout<<"Localization using Second Derivative\n";
-    cout<<"*********************************\n";
-    while(flag==1){
-        cout<<"Enter the threshold: ";
-        cin>> minThreshold;
-        SecondDerivative(minThreshold);
-        cout<<"Press 0 to terminate else press 1. \n";
-        cin>>flag;
-    }*/
-
     fout.close();
 }
 

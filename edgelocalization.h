@@ -51,42 +51,73 @@ double Bilinear_interpolation(double** arr, double x, double y){
     else return val;
 }
 
-double Weighted_Non_Maxima_Interpolation(double** arr,double x, double y){
-    int x1,y1,x2,y2,x3,y3,x4,y4;
-    double w1=0;double w2=0;double w3=0;double w4=0;
-    double averageweight_X=0;
-    x1=ceil(x); y1=ceil(y); //ceil(x), ceil(Y) -- Point 1 for interpolation
-    y2=floor(y); //ceil(x),floor(y) -- Point 2 for interpolation
-    x3=floor(x);y3=ceil(y); //floor(x),ceil(y) -- Point 3 for interpolation
-    y4=floor(y); //floor(x),floor(y) -- Point 4 for interpolation
+template<class GradType, class AngleType>
+double NonmaximaSuppression_Canny(GradType** scalegradientImg,GradType** sgradX,GradType** sgradY, AngleType** angleArray,double threshold){
+    int yb1,yt1,yb2,yt2;
+    int xb1,xb2,xt1,xt2;
+    for(int i=1; i<Xdim-1;i++){
+        for(int j=1;j<Ydim-1;j++){
+            double gmx=i;double gmy=j;
+            double angle=angleArray[i][j];
+            double gradientMagnitude=scalegradientImg[i][j];
+            double px=sgradX[i][j];
+            double py=sgradY[i][j];
+            int r=(int)((int)ReliableScale[i][j]/2.0);
+            if(r==0) r=1;
+            LocalMaxima[i][j]=scalegradientImg[i][j];
+            double localmaxima=true;
+            double gm;
+            if((angle>=0 && angle<=45)||(angle>=180 && angle<225)){
 
-    double weight=0;
-    if( x1>=0 && x1<Xdim && y1>=0 && y1<Ydim ){
-        w1=CartesianDistance2Double(x1,y1,x,y);
-        if(w1==0) w1=1;
-        averageweight_X+=((1.0/w1)*arr[x1][y1]);
-        weight+=(1.0/w1);
+                yb1=j;xb1=i+1;yb2=j-1;xb2=i+1;
+                yt1=j;xt1=i-1;yt2=j+1;xt2=i-1;
+                double xest=fabs(py/px);
+                double val1= xest*scalegradientImg[xt2][yt2]+(1-xest)*scalegradientImg[xt1][yt1];
+                double val2= xest*scalegradientImg[xb2][yb2]+(1-xest)*scalegradientImg[xb1][yb1];
+                gm=sqrt(fabs(gradientMagnitude-val1)*fabs(gradientMagnitude-val2));
+                if(val1>gradientMagnitude || val2>gradientMagnitude) LocalMaxima[i][j]=0;
+
+            }
+            else if((angle>45 && angle<=90)||(angle>225 && angle<=270)){
+
+                yb1=j+1;xb1=i;yb2=j+1;xb2=i-1;
+                yt1=j-1;xt1=i;yt2=j-1;xt2=i+1;
+                double xest=fabs(px/py);
+                double val1= xest*scalegradientImg[xt2][yt2]+(1-xest)*scalegradientImg[xt1][yt1];
+                double val2= xest*scalegradientImg[xb2][yb2]+(1-xest)*scalegradientImg[xb1][yb1];
+                gm=sqrt(fabs(gradientMagnitude-val1)*fabs(gradientMagnitude-val2));
+                if(val1>gradientMagnitude || val2>gradientMagnitude) LocalMaxima[i][j]=0;
+
+            }
+            else if((angle>90 && angle<=135)||(angle>270 && angle<=315)){
+
+                yb1=j+1;xb1=i;yb2=j+1;xb2=i+1;
+                yt1=j-1;xt1=i;yt2=j-1;xt2=i-1;
+                double xest=fabs(px/py);
+                double val1= xest*scalegradientImg[xt2][yt2]+(1-xest)*scalegradientImg[xt1][yt1];
+                double val2= xest*scalegradientImg[xb2][yb2]+(1-xest)*scalegradientImg[xb1][yb1];
+                gm=sqrt(fabs(gradientMagnitude-val1)*fabs(gradientMagnitude-val2));
+                if(val1>gradientMagnitude || val2>gradientMagnitude) LocalMaxima[i][j]=0;
+
+            }
+            else if((angle>135 && angle<=180)||(angle>315 && angle<=360)){
+
+                yb1=j;xb1=i+1;yb2=j+1;xb2=i+1;
+                yt1=j;xt1=i-1;yt2=j-1;xt2=i-1;
+                double xest=fabs(py/px);
+                double val1= xest*scalegradientImg[xt2][yt2]+(1-xest)*scalegradientImg[xt1][yt1];
+                double val2= xest*scalegradientImg[xb2][yb2]+(1-xest)*scalegradientImg[xb1][yb1];
+                gm=sqrt(fabs(gradientMagnitude-val1)*fabs(gradientMagnitude-val2));
+                if(val1>gradientMagnitude || val2>gradientMagnitude) LocalMaxima[i][j]=0;
+            }
+            if(LocalMaxima[i][j]!=0){
+                if((sqrt(fabs(gradientImage[i][j]-Minarr[i][j]))*(fabs(gradientMagnitude-LocalMinima[i][j])/(2*r)))<threshold) LocalMaxima[i][j]=0;
+            }
+        }
     }
-    if( x1>=0 && x1<Xdim && y2>=0 && y2<Ydim ){
-        w2=CartesianDistance2Double(x1,y2,x,y);
-        if(w2==0) w2=1;
-        averageweight_X+=((1.0/w2)*arr[x1][y2]);
-        weight+=(1.0/w2);
-    }
-    if( x3>=0 && x3<Xdim && y3>=0 && y3<Ydim ){
-        w3=CartesianDistance2Double(x3,y3,x,y);
-        if(w3==0)w3=1;
-        averageweight_X+=((1.0/w3)*arr[x3][y3]);
-        weight+=(1.0/w3);
-    }
-    if( x3>=0 && x3<Xdim && y4>=0 && y4<Ydim ){
-        w4=CartesianDistance2Double(x3,y4,x,y);
-        if(w4==0) w4=1;
-        averageweight_X+=((1.0/w4)*arr[x3][y4]);
-        weight+=(1.0/w4);
-    }
-    if(weight==0) return averageweight_X;
-    return averageweight_X/weight;
+
+    CImg<int> localmaximaimage(Xdim,Ydim,1,1);
+    writeImage<double, int>(LocalMaxima,Xdim,Ydim,localmaximaimage,localmaximaimagename,true);
 }
 
 template<class GradType, class AngleType>
@@ -102,6 +133,7 @@ void NonmaximaSuppression(GradType** scalegradientImg, AngleType** angleArray,do
             bool localMaxima=true;
             double min1=gradientMagnitude;
             double min2=gradientMagnitude;
+
 
             for(double r=-radius;r<=-0.5;r+=0.5){
                 double xcoord=i-r*cos(rad_angle);
@@ -122,10 +154,7 @@ void NonmaximaSuppression(GradType** scalegradientImg, AngleType** angleArray,do
             }
             if(!localMaxima) LocalMaxima[i][j]=0;
             else{
-                double diff1=gradientMagnitude-min1;
-                double diff2=gradientMagnitude-min2;
-                double depth_thresh=sqrt(diff1*diff2)/(2*radius);
-                if(depth_thresh<threshold) LocalMaxima[i][j]=0;
+                if((sqrt(fabs(gradientImage[i][j]-Minarr[i][j])*(fabs(gradientMagnitude-LocalMinima[i][j])/(2*radius))))<threshold) LocalMaxima[i][j]=0;
             }
         }
     }
@@ -133,7 +162,7 @@ void NonmaximaSuppression(GradType** scalegradientImg, AngleType** angleArray,do
     writeImage<double, int>(LocalMaxima,Xdim,Ydim,localmaximaimage,localmaximaimagename,true);
 }
 
-void HysteresisThresholding(double MinThresh, double MaxThresh){
+void HysteresisThresholding(double MinThresh, double MaxThresh, string filename){
     bool changed=true;
     for(int i=0;i<Xdim;i++){
         for(int j=0;j<Ydim;j++){
@@ -169,7 +198,7 @@ void HysteresisThresholding(double MinThresh, double MaxThresh){
         }
 
     CImg<unsigned short> Hysteresisimage(Xdim,Ydim,1,1);
-    writeImage<double, unsigned short>(Hysteresis,Xdim,Ydim,Hysteresisimage,Hysteresisimagename,true);
+    writeImage<double, unsigned short>(Hysteresis,Xdim,Ydim,Hysteresisimage,filename,true);
 }
 
 

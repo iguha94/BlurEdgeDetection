@@ -55,6 +55,9 @@ void allocateGradientImageMemory(int Rows, int Cols){
     DialatedScale=new unsigned short*[Rows];
     Dividorarr=new double*[Rows];
     countarr=new int*[Rows];
+    ScaleGradientX=new double*[Rows];
+    ScaleGradientY=new double*[Rows];
+    Minarr=new double*[Rows];
     for(int i=0;i<Rows;i++){
         ReliableScale[i]=new double[Cols];
         gradientImage[i]=new double[Cols];
@@ -70,6 +73,9 @@ void allocateGradientImageMemory(int Rows, int Cols){
         DialatedScale[i]=new unsigned short[Cols];
         Dividorarr[i]=new double[Cols];
         countarr[i]=new int[Cols];
+        ScaleGradientX[i]=new double[Cols];
+        ScaleGradientY[i]=new double[Cols];
+        Minarr[i]=new double[Cols];
         for(int j=0;j<Cols;j++){
             ReliableScale[i][j]=0;
             gradientImage[i][j]=0;
@@ -83,6 +89,9 @@ void allocateGradientImageMemory(int Rows, int Cols){
             DialatedScale[i][j]=0;
             Dividorarr[i][j]=0;
             countarr[i][j]=0;
+            ScaleGradientX[i][j]=0;
+            ScaleGradientY[i][j]=0;
+            Minarr[i][j]=0;
         }
     }
 

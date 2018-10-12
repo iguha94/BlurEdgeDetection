@@ -114,8 +114,8 @@ void allocateGradientImageMemory(int Rows, int Cols){
     cout<<"Allocated Gradient Memory Successfully 1! \n";
     
     int num=2*4*(maxscale+1);
-    weight_gradient_matrix=new double***[maxscale*2];
-    for(int i=0;i<maxscale*2;i++){
+    weight_gradient_matrix=new double***[(maxscale+1)*2];
+    for(int i=0;i<(maxscale+1)*2;i++){
         weight_gradient_matrix[i]=new double**[num];
         for(int j=0;j<num;j++){
             weight_gradient_matrix[i][j]=new double*[no_of_interpolating_points];
@@ -156,7 +156,7 @@ void writeImage(T1** arr, int Rows, int Cols,CImg<T2> cimg,string filename, bool
     for(int i=0;i<Rows;i++){
         for(int j=0;j<Cols;j++){
             T2 value=(T2) arr[i][j];
-            cimg(i,j)=arr[i][j];
+            cimg(i,j)=value;
         }
     }
 

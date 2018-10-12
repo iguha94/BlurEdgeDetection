@@ -12,6 +12,7 @@
 #include "edgelocalization.h"
 using namespace std;
 
+int percent=20;
 void init_scale_params(){
     pointsunderarea=1;
     Totalweight=1;
@@ -21,42 +22,36 @@ void init_scale_params(){
 
 }
 
-void drawCirclePoints(unsigned short** arr, int r, int xc, int yc, int curx, int cury, int Rows, int Cols)
+void drawCirclePoints(double** arr, int r, int xc, int yc, int curx, int cury, int Rows, int Cols)
 {
 
-    if(xc - curx >= 0 && yc - cury >= 0 ) {
-        spercentile.push_back(arr[xc-curx][yc-cury]);
+    if(xc - curx >= 0 && yc - cury >= 0 /*&& ReliableScale[xc-curx][yc-cury]>arr[xc][yc]*/ ) {
+        percentile.push_back( arr[xc-curx][yc-cury]);
     }
-    if(xc - curx >= 0 && yc + cury < Cols ) {
-        spercentile.push_back(arr[xc - curx][yc + cury]);
-        //if(<mingrad) mingrad=arr[xc - curx][yc + cury];
+    if(xc - curx >= 0 && yc + cury < Cols /*&& ReliableScale[xc - curx][yc + cury]>arr[xc][yc]*/) {
+        percentile.push_back( arr[xc - curx][yc + cury]);
     }
-    if(xc + curx < Rows && yc - cury >= 0 ) {
-        spercentile.push_back(arr[xc + curx][yc - cury]);
+    if(xc + curx < Rows && yc - cury >= 0 /*&& ReliableScale[xc + curx][yc - cury]>arr[xc][yc]*/) {
+        percentile.push_back(arr[xc + curx][yc - cury]);
     }
-    if(yc + cury < Cols && xc + curx < Rows) {
-        spercentile.push_back(arr[xc + curx][yc + cury]);
-        //if(<mingrad) mingrad=arr[xc + curx][yc + cury];
+    if(yc + cury < Cols && xc + curx < Rows /*&& ReliableScale[xc + curx][yc + cury]>arr[xc][yc]*/) {
+        percentile.push_back(arr[xc + curx][yc + cury]);
     }
-    if(xc - cury >= 0 && yc - curx >= 0 ) {
-        spercentile.push_back(arr[xc - cury][yc - curx]);
-       // if(<mingrad) mingrad=arr[xc - cury][yc - curx];
+    if(xc - cury >= 0 && yc - curx >= 0 /*&& ReliableScale[xc - cury][yc - curx]>arr[xc][yc]*/ ) {
+        percentile.push_back(arr[xc - cury][yc - curx]);
     }
-    if(yc - curx >= 0 && xc + cury < Rows) {
-        spercentile.push_back(arr[xc + cury][yc - curx]);
-        //if(<mingrad) mingrad=arr[xc + cury][yc - curx];
+    if(yc - curx >= 0 && xc + cury < Rows /*&& ReliableScale[xc + cury][yc - curx]>arr[xc][yc]*/ ) {
+        percentile.push_back(arr[xc + cury][yc - curx]);
     }
-    if(xc + cury < Rows && yc + curx < Cols ) {
-        spercentile.push_back(arr[xc + cury][yc + curx]);
-        //if(<mingrad) mingrad=arr[xc + cury][yc + curx];
+    if(xc + cury < Rows && yc + curx < Cols /*&& ReliableScale[xc + cury][yc + curx]>arr[xc][yc]*/) {
+        percentile.push_back(arr[xc + cury][yc + curx]);
     }
-    if(xc - cury >= 0 && yc + curx < Cols ) {
-        spercentile.push_back(arr[xc - cury][yc + curx]);
-        //if(<mingrad) mingrad=arr[xc - cury][yc + curx];
+    if(xc - cury >= 0 && yc + curx < Cols /*&& ReliableScale[xc - cury][yc + curx]>arr[xc][yc]*/) {
+        percentile.push_back(arr[xc - cury][yc + curx]);
     }
 }
 
-void drawCircle(unsigned short** arr, int xc, int yc, int Rows, int Cols, int r)
+void drawCircle(double** arr, int xc, int yc, int Rows, int Cols, int r)
 {
     int curx = 0;
     int cury = r;
@@ -75,25 +70,25 @@ void drawCircle(unsigned short** arr, int xc, int yc, int Rows, int Cols, int r)
 }
 
 void DialateScale(int prcntile=25){
-    for(int i=0;i<Xdim;i++){
-        for(int j=0;j<Ydim;j++){
-            DialatedScale[i][j]=gradImage[i][j];
-        }
-    }
+    //    for(int i=0;i<Xdim;i++){
+    //        for(int j=0;j<Ydim;j++){
+    //            DialatedScale[i][j]=gradImage[i][j];
+    //        }
+    //    }
 
     for(int i=0;i<Xdim;i++){
         for(int j=0;j<Ydim;j++){
             ncount=0;
-            spercentile.clear();
-            //for(int k=1;k<ReliableScale[i][j]/2;k++)
-            drawCircle(DialatedScale,i,j,Xdim,Ydim,ReliableScale[i][j]/2);
-            sort(spercentile.begin(),spercentile.end());
-            int index=(spercentile.size()+1)*(prcntile/100);
-            LocalMinima[i][j]=spercentile[index];
+            //for(int k=1;k<(ReliableScale[i][j]-1)/2;k++)
+            percentile.clear();
+            int r=(int)(ReliableScale[i][j]/2);
+            drawCircle(gradImage,i,j,Xdim,Ydim,r);
+            sort(percentile.begin(),percentile.end());
+            int index=(prcntile)*percentile.size();
+            index/=100;
+            LocalMinima[i][j]= percentile[index];
         }
-
     }
-
 }
 
 double getInterpolatedGradientX(double x, double y, int Rows, int Cols, int index){
@@ -238,9 +233,9 @@ void draw_continuous_scale(unsigned short** arr, int xc, int yc, int Rows, int C
 
 void compute_scale_Gradient_with_continuous_interpolation(unsigned short** arr,int Rows, int Cols,bool usigned=false,bool isprint=false){
     ofstream fout;
-    string fname=basepath+"scaleList.txt";
+    //string fname=basepath+"scaleList.txt";
 
-    fout.open(fname.c_str(),ios::app);
+    //fout.open(fname.c_str(),ios::app);
     for(int i=0;i<Rows;i++){
         for(int j=0;j<Cols;j++){
             init_scale_params();
@@ -262,30 +257,27 @@ void compute_scale_Gradient_with_continuous_interpolation(unsigned short** arr,i
                 prevcount=pointsunderarea;
                 scale=scale+0.5;
                 totalpoints=0;
-                ScaleGradientX[i][j]=TotalweightX/2;
-                ScaleGradientY[i][j]=TotalweightY/2;
-                //gradImage[i][j]=totalgradient1;
+                ScaleGradientX[i][j]=TotalweightX/2.0;
+                ScaleGradientY[i][j]=TotalweightY/2.0;
                 gradImage[i][j]=totalgradient1;
                 ReliableScale[i][j]=scale*2;
-                if(scale>=maxscale) break;
+                if(scale>maxscale) break;
                 draw_continuous_scale(arr,i,j,Rows,Cols,scale);
-                Minarr[i][j]=GetLowerPercentile(percentile,10); //also compute the 50%-ile for scalebased gradientimage
+                Minarr[i][j]=GetLowerPercentile(percentile,percent); //also compute the 50%-ile for scalebased gradientimage
                 int flag=1;
                 if(2*scale<=6) flag=0;
 
                 double varx=compute_variance_X_from_inner(2*scale,flag);
                 double vary=compute_variance_Y_from_inner(2*scale,flag);
-
-                double prevmean=squareroot<double>(globalmeanX,globalmeanY);
                 gradientvar=varx+vary;
 
-                if(gradientvar==0) signal_to_noise_ratio=0;
+                //double prevmean=squareroot<double>(globalmeanX,globalmeanY);
+                /*if(gradientvar==0) signal_to_noise_ratio=0;
                 else if(gradientvar<(1)) signal_to_noise_ratio=1;
-                else signal_to_noise_ratio=prevmean/sqrt(gradientvar);
-                signal_to_noise_ratio=1;
+                else signal_to_noise_ratio=prevmean/sqrt(gradientvar);*/
+                //signal_to_noise_ratio=1;
 
                 gradthreshold=compute_threshold(totalpoints);
-
                 totalgradient1=squareroot<double>(TotalweightX/2,TotalweightY/2);
                 totalgradient=curgrad/(snr*totalpoints);
                 gradienthresh/=sqrt(totalpoints);
@@ -294,13 +286,14 @@ void compute_scale_Gradient_with_continuous_interpolation(unsigned short** arr,i
 
             Dividorarr[i][j]=signal_to_noise_ratio*10;
 
-            if(scale==0.5) {gradImage[i][j]/=(3);gradImage[i][j]*=(signal_to_noise_ratio*2*scale);ScaleGradientX[i][j]*=2;ScaleGradientY[i][j]*=2;}
-            else { gradImage[i][j]/=(prevcount); gradImage[i][j]*=(signal_to_noise_ratio*2*scale);}
-            Gradientangle[i][j]=computeAngle(TotalweightX/2,TotalweightY/2);
+            if(scale==0.5) {gradImage[i][j]/=(3);gradImage[i][j]*=(2*scale);}
+            else { gradImage[i][j]/=(prevcount); gradImage[i][j]*=(2*scale);}
+            gradImage[i][j]+=gradientImage[i][j];
+            //Gradientangle[i][j]=computeAngle(ScaleGradientX[i][j],ScaleGradientY[i][j]);
         }
     }
 
-    DialateScale(10);
+    DialateScale(percent);
 
     /*if(usigned){
         CImg<unsigned short> scalejpgimage(Xdim,Ydim,1,1);
@@ -311,15 +304,15 @@ void compute_scale_Gradient_with_continuous_interpolation(unsigned short** arr,i
     CImg<unsigned short> scalejpgimage(Xdim,Ydim,1,1);
     writeImage<double, unsigned short>(ReliableScale,Rows,Cols,scalejpgimage,scaleimagename,true);
     CImg<long int> gradientjpgimage(Xdim,Ydim,1,1);
-    writeImage<double, long int>(gradImage,Rows,Cols,gradientjpgimage,gradientimagename,true);
+    writeImage<double, long int>(gradImage,Rows,Cols,gradientjpgimage,gradientimagename,false);
 
     gradient_color_Image(Gradientangle,gradImage,gradientcolorimagename);
 
-    CImg<unsigned short> dialatejpgimage(Xdim,Ydim,1,1);
-    writeImage<unsigned short>(DialatedScale,Xdim,Ydim,dialatejpgimage,dialatedimagename);
+    //CImg<unsigned short> dialatejpgimage(Xdim,Ydim,1,1);
+    //writeImage<unsigned short>(DialatedScale,Xdim,Ydim,dialatejpgimage,dialatedimagename);
 
-    CImg<unsigned short> dividorjpg(Xdim,Ydim,1,1);
-    writeImage<double>(Dividorarr,Xdim,Ydim,dividorjpg,dividorimagename);
+    //CImg<unsigned short> dividorjpg(Xdim,Ydim,1,1);
+   //writeImage<double>(Dividorarr,Xdim,Ydim,dividorjpg,dividorimagename);
 
     int flag=1;
     double maxThreshold,minThreshold,threshold;
@@ -338,7 +331,7 @@ void compute_scale_Gradient_with_continuous_interpolation(unsigned short** arr,i
         cout<<"Press 0 to terminate else press 1. \n";
         cin>>flag;
     }
-    fout.close();
+    //fout.close();
 }
 
 #endif // CONTINUOUSSCALECOMPUTATION_H

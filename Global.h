@@ -177,7 +177,7 @@ double**** weight_gradient_matrix;
 int no_of_interpolating_points;
 int totalpoints;
 double minimumGradient;
-string basepath="/nfs/s-l011/local/vol01/i/iguha/Documents/Phd-iguha/Imagesfortesting/ACIVS/";
+string basepath;//="/nfs/s-l011/local/vol01/i/iguha/Documents/Phd-iguha/Imagesfortesting/Comparison/Data12/";
 double interpolatingpoint_weight;
 int sampling_rate;
 ofstream sout;

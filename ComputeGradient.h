@@ -85,7 +85,7 @@ void computegaussGradient(unsigned short** arr, int x, int y,int Rows, int Cols,
     isComputed[x][y]=true;
 }
 
-void compute_Gradient(unsigned short** arr,int Rows, int Cols, bool usigned=false){
+void compute_Gradient(unsigned short** arr,int Rows, int Cols, bool usigned=false,bool writeimage=true){
     for(int i=0;i<Rows;i++){
         for(int j=0;j<Cols;j++){
             if(arr[i][j]>=minIntensity ){
@@ -96,13 +96,13 @@ void compute_Gradient(unsigned short** arr,int Rows, int Cols, bool usigned=fals
             }
         }
     }
-    if(usigned){
+    if(usigned && writeimage){
         CImg<unsigned short> scalejpgimage(Xdim,Ydim,1,1);
         writeImageunsigned< double, unsigned short>(gradientImage,Rows,Cols,scalejpgimage,gaussgradientimagename);
         //writeImagefile< unsigned short>(gradientImage,Rows,Cols,gaussgradientimagename);
         gradient_color_Image(Gradientangle,gradientImage,gausscolorimagename);
     }
-    else{
+    else if(!usigned && writeimage){
         CImg<unsigned short> scalejpgimage(Xdim,Ydim,1,1);
         writeImage< double, unsigned short>(gradientImage,Rows,Cols,scalejpgimage,gaussgradientimagename);
         gradient_color_Image(Gradientangle,gradientImage,gausscolorimagename);

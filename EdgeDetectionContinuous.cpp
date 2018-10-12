@@ -14,8 +14,8 @@ using namespace cimg_library;
 
 int main(int argc, char* argv[]) {
 
-    string logfile=basepath+"log.txt";
-    logger.open(logfile.c_str());
+    //string logfile=basepath+"log.txt";
+    //logger.open(logfile.c_str());
     //confidence=1.5*pow(10,-8);
     //memconf=confidence;
     bool b=false;
@@ -28,6 +28,7 @@ int main(int argc, char* argv[]) {
     colorgaussvar=atof(argv[3]);
     maxscale=atof(argv[4]);
     snr=atof(argv[5]);
+    basepath=string(argv[6]);
 
     kernelsize=6*gaussgradvar;
     if(kernelsize%2==0) kernelsize+=1;
@@ -42,8 +43,8 @@ int main(int argc, char* argv[]) {
     //cout<<"Interrmediate Scale: ";
     //cin>>intermediatescale;
 
-    string sfname=basepath+"gradMap.txt";
-    sout.open(sfname.c_str());
+    //string sfname=basepath+"gradMap.txt";
+    //sout.open(sfname.c_str());
 
     no_of_interpolating_points=3; //denotes the number of samples taken for each point, r,r-0.25,r+0.25
 
@@ -56,9 +57,9 @@ int main(int argc, char* argv[]) {
     gradientcolorimagename=basepath+"scale-gradientcolor-"+curimagefile;
     gausscolorimagename=basepath+"point-gradient-color-"+curimagefile;
     localmaximaimagename=basepath+"localmaxima-"+curimagefile;
-    Hysteresisimagename=basepath+"hysteresis-"+curimagefile;
+    Hysteresisimagename=basepath+"scalebasededge_"+curimagefile;
     secondderivativeimagename=basepath+"sd-"+curimagefile;
-    localizedimagename=basepath+"localized-"+curimagefile;
+    localizedimagename=basepath+"Canny-"+curimagefile;
     dialatedimagename=basepath+"dialated-"+curimagefile;
     dividorimagename=basepath+"dividor-"+curimagefile;
 
@@ -75,24 +76,6 @@ int main(int argc, char* argv[]) {
     gradienthresh=6;
 
     compute_Gradient(image,Xdim,Ydim);
-    int flag=1;
-    double maxThreshold,minThreshold,threshold;
-
-    cout<<"*********************************\n";
-    cout<<"Localization using Canny's Method\n";
-    cout<<"*********************************\n";
-    while(flag==1){
-        cout<<"Enter Lower and Higher Hysteresis Threshold: ";
-        cin>>minThreshold>>maxThreshold;
-        cout<<"Enter Non maxima suppression threshhold: ";
-        cin>>threshold;
-        //NonmaximaSuppression<double,double>(gradImage,Gradientangle,threshold);
-        NonmaximaSuppression_Canny<double,double>(gradientImage,GradientX,GradientY,Gradientangle,threshold);
-        HysteresisThresholding(minThreshold,maxThreshold,localizedimagename);
-        cout<<"Press 0 to terminate else press 1. \n";
-        cin>>flag;
-    }
-    cout<<"Shutting Down Canny Edge and Starting Blur Edge Detection---\n";
     compute_scale_Gradient_with_continuous_interpolation(image,Xdim,Ydim,b);
     sout.close();
     logger.close();

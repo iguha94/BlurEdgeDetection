@@ -23,28 +23,6 @@ public:
     }
 };
 
-class BPoint{
-public:
-    double x;
-    double y;
-    double value;
-    BPoint(double x, double y, double value){
-        this->x=x;
-        this->y=y;
-        this->value=value;
-    }
-};
-
-class varNode{
-public:
-  double val1;
-  double val2;
-  varNode(double val1, double val2){
-    this->val1=val1;
-    this->val2=val2;
-  }
-};
-
 unsigned short ushrtmax=32768;
 unsigned short** image;
 double** gradImage;
@@ -78,6 +56,9 @@ unsigned short minIntensity=0;
 map<long long int, bool> scaleMap;
 list<Point> weightvector;
 
+int maxkernelsize;
+double*** PrecomputedKernelsX;
+double*** PrecomputedKernelsY;
 double maxvar=10;
 double minval=1;
 double** kernelX;
@@ -91,6 +72,7 @@ double** kernelSY;
 double** kernelSXY;
 double** Dividorarr;
 double** Minarr;
+double** MaximizedScale;
 
 double** GradientX;
 double** GradientY;

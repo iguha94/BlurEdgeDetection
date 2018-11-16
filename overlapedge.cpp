@@ -21,7 +21,7 @@ void ImposeonGrayImage(string imagename, string skeletonname){
     RGBimage=convert_to_RGB_image<unsigned short>(jpgimage);
     CImg<unsigned short> skeljpgimage(skeletonname.c_str());
     cimg_forXY(skeljpgimage,x,y){
-        if(skeljpgimage(x,y)>1){
+        if(x>2 && y>2 && x<Xdim-3 && y<Ydim-3 && skeljpgimage(x,y)>1){
             RGBimage(x,y,0,0)=(r);
             RGBimage(x,y,0,1)=(g);
             RGBimage(x,y,0,2)=(b);
@@ -58,6 +58,7 @@ int main(int argc, char*argv[]){
     r=atoi(argv[3]);
     g=atoi(argv[4]);
     b=atoi(argv[5]);
-    //ImposeonGrayImage(imagename,skeletonname);
-    ImposeonRGBImage(imagename,skeletonname);
+    basepath=string(argv[6]);
+    ImposeonGrayImage(imagename,skeletonname);
+    //ImposeonRGBImage(imagename,skeletonname);
 }

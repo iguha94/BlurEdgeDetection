@@ -30,9 +30,6 @@ int main(int argc, char* argv[]) {
     snr=atof(argv[5]);
     basepath=string(argv[6]);
 
-    kernelsize=6*gaussgradvar;
-    if(kernelsize%2==0) kernelsize+=1;
-    kernelsize=kernelsize>3?kernelsize:3;
 
     //cout<<"Enter membership value: ";
     //cin>>memconf;
@@ -69,12 +66,22 @@ int main(int argc, char* argv[]) {
     cout<<"Image Size: "<<Xdim<< " X "<<Ydim<<"\n";
     allocateMemory(Xdim,Ydim);
     allocateGradientImageMemory(Xdim,Ydim);
-    initializeKernels(kernelsize);
+    maxkernelsize=7*maxscale;
+    if(maxkernelsize%2==0) maxkernelsize+=1;
+    allocateKernelMemory(maxscale,maxkernelsize);
+    PrecomputeKernels(maxscale);
+    cout<<"Kernels Precomputed\n";
+
     readImage<unsigned short>(jpgimage,image);
 
     noisestdv=snr*snr;
     gradienthresh=6;
-
+    gaussgradvar=atof(argv[2]);
+    kernelsize=6*gaussgradvar;
+    if(kernelsize%2==0) kernelsize+=1;
+    kernelsize=kernelsize>3?kernelsize:3;
+    initializeKernels(kernelsize);
+    cout<<"Initilaized Point Gradients\n";
     compute_Gradient(image,Xdim,Ydim);
     compute_scale_Gradient_with_continuous_interpolation(image,Xdim,Ydim,b);
     sout.close();

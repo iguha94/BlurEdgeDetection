@@ -34,9 +34,35 @@ void deallocategradImageMemory(){
     gradientImage=NULL;
 }
 
+template<class T>
+void deallocateMemory(T** arr,int Xdim,int Ydim){
+    for(int i=0;i<Xdim;i++){
+        free(arr[i]);
+    }
+    free(arr);
+}
+
 void deallocateKernels(){
     kernelX=NULL;
     kernelY=NULL;
+}
+
+void allocateKernelMemory(int maxstdv,int dim){
+    PrecomputedKernelsX=new double**[2*maxstdv+2];
+    PrecomputedKernelsY=new double**[2*maxstdv+2];
+    for(int i=0;i<(2*maxstdv+2);i++){
+        PrecomputedKernelsX[i]=new double*[dim];
+        PrecomputedKernelsY[i]=new double*[dim];
+        for(int j=0;j<dim;j++){
+            PrecomputedKernelsX[i][j]=new double[dim];
+            PrecomputedKernelsY[i][j]=new double[dim];
+            for(int k=0;k<dim;k++){
+                PrecomputedKernelsX[i][j][k]=0;
+                PrecomputedKernelsY[i][j][k]=0;
+            }
+        }
+    }
+    cout<<"Allocated Memory\n";
 }
 
 void allocateGradientImageMemory(int Rows, int Cols){
@@ -55,6 +81,10 @@ void allocateGradientImageMemory(int Rows, int Cols){
     DialatedScale=new unsigned short*[Rows];
     Dividorarr=new double*[Rows];
     countarr=new int*[Rows];
+    ScaleGradientX=new double*[Rows];
+    ScaleGradientY=new double*[Rows];
+    Minarr=new double*[Rows];
+    MaximizedScale=new double*[Rows];
     for(int i=0;i<Rows;i++){
         ReliableScale[i]=new double[Cols];
         gradientImage[i]=new double[Cols];
@@ -70,6 +100,10 @@ void allocateGradientImageMemory(int Rows, int Cols){
         DialatedScale[i]=new unsigned short[Cols];
         Dividorarr[i]=new double[Cols];
         countarr[i]=new int[Cols];
+        ScaleGradientX[i]=new double[Cols];
+        ScaleGradientY[i]=new double[Cols];
+        Minarr[i]=new double[Cols];
+        MaximizedScale[i]=new double[Cols];
         for(int j=0;j<Cols;j++){
             ReliableScale[i][j]=0;
             gradientImage[i][j]=0;
@@ -83,6 +117,10 @@ void allocateGradientImageMemory(int Rows, int Cols){
             DialatedScale[i][j]=0;
             Dividorarr[i][j]=0;
             countarr[i][j]=0;
+            ScaleGradientX[i][j]=0;
+            ScaleGradientY[i][j]=0;
+            Minarr[i][j]=0;
+            MaximizedScale[i][j]=0;
         }
     }
 
@@ -105,8 +143,8 @@ void allocateGradientImageMemory(int Rows, int Cols){
     cout<<"Allocated Gradient Memory Successfully 1! \n";
     
     int num=2*4*(maxscale+1);
-    weight_gradient_matrix=new double***[maxscale*2];
-    for(int i=0;i<maxscale*2;i++){
+    weight_gradient_matrix=new double***[(maxscale+1)*2];
+    for(int i=0;i<(maxscale+1)*2;i++){
         weight_gradient_matrix[i]=new double**[num];
         for(int j=0;j<num;j++){
             weight_gradient_matrix[i][j]=new double*[no_of_interpolating_points];
@@ -147,7 +185,7 @@ void writeImage(T1** arr, int Rows, int Cols,CImg<T2> cimg,string filename, bool
     for(int i=0;i<Rows;i++){
         for(int j=0;j<Cols;j++){
             T2 value=(T2) arr[i][j];
-            cimg(i,j)=arr[i][j];
+            cimg(i,j)=value;
         }
     }
 

@@ -23,6 +23,13 @@ double  colorgaussian(double intensity,double mean, double var){
     return gaussval;
 }
 
+double GetLowerPercentile(vector<double> vec,double X){
+    int n=vec.size();
+    int rank=(X/100)*(n+1); //simple rounding , but other more accurate methods are available
+    sort(vec.begin(),vec.end());
+    return vec[rank];
+}
+
 double multivariateGaussian(double x, double y, double meanx, double meany, double stdx, double stdy, double covxy){
     double rho=covxy/(stdx*stdy);
     double firstterm=(x-meanx)*(x-meanx);

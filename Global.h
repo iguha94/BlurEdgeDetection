@@ -5,6 +5,8 @@
 #include <map>
 #include <list>
 #include <fstream>
+#include <vector>
+#include <algorithm>
 
 #define ushrt unsigned short
 using namespace std;
@@ -19,28 +21,6 @@ public:
         this->y=y;
         this->value=value;
     }
-};
-
-class BPoint{
-public:
-    double x;
-    double y;
-    double value;
-    BPoint(double x, double y, double value){
-        this->x=x;
-        this->y=y;
-        this->value=value;
-    }
-};
-
-class varNode{
-public:
-  double val1;
-  double val2;
-  varNode(double val1, double val2){
-    this->val1=val1;
-    this->val2=val2;
-  }
 };
 
 unsigned short ushrtmax=32768;
@@ -76,6 +56,9 @@ unsigned short minIntensity=0;
 map<long long int, bool> scaleMap;
 list<Point> weightvector;
 
+int maxkernelsize;
+double*** PrecomputedKernelsX;
+double*** PrecomputedKernelsY;
 double maxvar=10;
 double minval=1;
 double** kernelX;
@@ -88,9 +71,13 @@ double** kernelSX;
 double** kernelSY;
 double** kernelSXY;
 double** Dividorarr;
+double** Minarr;
+double** MaximizedScale;
 
 double** GradientX;
 double** GradientY;
+double** ScaleGradientX;
+double** ScaleGradientY;
 double** LocalMaxima;
 double** LocalMinima;
 double** Hysteresis;
@@ -165,13 +152,14 @@ string dividorimagename;
 string secondderivativeimagename;
 int maxscale;
 double ncount;
-
+vector<double> percentile;
+vector<double> spercentile;
 double butterworth_cutoff;
 double**** weight_gradient_matrix;
 int no_of_interpolating_points;
 int totalpoints;
 double minimumGradient;
-string basepath="/nfs/s-l011/local/vol01/i/iguha/Documents/Phd-iguha/Imagesfortesting/ACIVS/";
+string basepath;//="/nfs/s-l011/local/vol01/i/iguha/Documents/Phd-iguha/Imagesfortesting/Comparison/Data12/";
 double interpolatingpoint_weight;
 int sampling_rate;
 ofstream sout;

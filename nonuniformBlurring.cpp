@@ -8,6 +8,7 @@
 using namespace std;
 using namespace cimg_library;
 
+int loopcnt;
 
 //initializing  gaussian smoothing.
 void GaussianSmoothingKernel(int dim,double variance,bool isprint=false){
@@ -19,19 +20,19 @@ void GaussianSmoothingKernel(int dim,double variance,bool isprint=false){
         }
     }
     double totalweight=0;
-    loopcnts=dim/2;
-    for(int i=-loopcnts;i<=loopcnts;i++){
-        for(int j=-loopcnts;j<=loopcnts;j++){
+    loopcnt=dim/2;
+    for(int i=-loopcnt;i<=loopcnt;i++){
+        for(int j=-loopcnt;j<=loopcnt;j++){
             double dist=CartesianDistance2D(0,0,i,j);
-            kernelX[loopcnts+i][loopcnts+j]=gaussian(dist,0,variance);
-            totalweight+=kernelX[loopcnts+i][loopcnts+j];
+            kernelX[loopcnt+i][loopcnt+j]=gaussian(dist,0,variance);
+            totalweight+=kernelX[loopcnt+i][loopcnt+j];
         }
     }
     if(isprint)
         cout<<"Totalweight: "<<totalweight<<"\n";
-    for(int i=-loopcnts;i<=loopcnts;i++){
-        for(int j=-loopcnts;j<=loopcnts;j++){
-            kernelX[loopcnts+i][loopcnts+j]/=totalweight;
+    for(int i=-loopcnt;i<=loopcnt;i++){
+        for(int j=-loopcnt;j<=loopcnt;j++){
+            kernelX[loopcnt+i][loopcnt+j]/=totalweight;
         }
 
     }
@@ -40,10 +41,10 @@ void GaussianSmoothingKernel(int dim,double variance,bool isprint=false){
 
 unsigned short gaussianSmoothing(unsigned short** arr, int x, int y, int dim){
     double GradX=0.0;
-    for(int i=-loopcnts;i<=loopcnts;i++){
-        for(int j=-loopcnts;j<=loopcnts;j++){
+    for(int i=-loopcnt;i<=loopcnt;i++){
+        for(int j=-loopcnt;j<=loopcnt;j++){
             if(x+i>=0&&y+j>=0&&x+i<Xdim&&y+j<Ydim){
-                GradX=GradX+arr[x+i][y+j]*kernelX[i+loopcnts][j+loopcnts];
+                GradX=GradX+arr[x+i][y+j]*kernelX[i+loopcnt][j+loopcnt];
             }
         }
     }
@@ -62,7 +63,7 @@ void uniformBlurring(string displayimage, string writeimage){
     CImg<unsigned short> smoothjpg(Xdim,Ydim,1,1);
     allocateMemory(Xdim,Ydim);
     readImage<unsigned short>(jpgimage,image);
-    readImage<unsigned short>(jpgimage,gradImage);
+    readImage<double>(jpgimage,gradImage);
 
     for(int i=0;i<Xdim;i++){
         for(int j=0;j<Ydim;j++){
@@ -72,7 +73,7 @@ void uniformBlurring(string displayimage, string writeimage){
             gradImage[i][j]=gaussianSmoothing(image,i,j,window);
         }
     }
-    writeImage<unsigned short>(gradImage,Xdim,Ydim,smoothjpg,writeimage);
+    writeImage<double,unsigned short>(gradImage,Xdim,Ydim,smoothjpg,writeimage);
 }
 
 void blurComputationfromimage(string displayimage, string smoothimagepath, string writeImagename){
@@ -85,8 +86,8 @@ void blurComputationfromimage(string displayimage, string smoothimagepath, strin
     Xdim=jpgimage.width();Ydim=jpgimage.height();
     allocateMemory(Xdim,Ydim);
     readImage<unsigned short>(jpgimage,image);
-    readImage<unsigned short>(jpgimage,gradImage);
-    readImage<unsigned short>(smoothimage,gradientImage);
+    readImage<double>(jpgimage,gradImage);
+    readImage<double>(smoothimage,gradientImage);
     for(int i=0;i<Xdim;i++){
         for(int j=0;j<Ydim;j++){
             flag=false;
@@ -101,7 +102,7 @@ void blurComputationfromimage(string displayimage, string smoothimagepath, strin
 
         }
     }
-    writeImage<unsigned short>(gradImage,Xdim,Ydim,smoothimage,writeImagename);
+    writeImage<double,unsigned short>(gradImage,Xdim,Ydim,smoothimage,writeImagename);
 }
 
 void blurComputationfromfile(string displayimage,string writeImagename,string filename){
@@ -116,7 +117,7 @@ void blurComputationfromfile(string displayimage,string writeImagename,string fi
     CImg<unsigned short> smoothjpg(Xdim,Ydim,1,1);
     allocateMemory(Xdim,Ydim);
     readImage<unsigned short>(jpgimage,image);
-    readImage<unsigned short>(jpgimage,gradImage);
+    readImage<double>(jpgimage,gradImage);
 
     while(fin>>x>>y>>sigma){
         int sig=sigma;
@@ -129,14 +130,15 @@ void blurComputationfromfile(string displayimage,string writeImagename,string fi
         gradImage[x][y]=gaussianSmoothing(image,x,y,window);
 
     }
-    writeImage<unsigned short>(gradImage,Xdim,Ydim,smoothjpg,writeImagename);
+    writeImage<double,unsigned short>(gradImage,Xdim,Ydim,smoothjpg,writeImagename);
 }
 
-int main() {
+int main(int argc, char* argv[]) {
 
     string displayimagefilename;
     string scaleimage;
     string smoothimagepath;
+    basepath=string(argv[1]);
     cout<<"Display Image: ";
     cin>>displayimagefilename;
     string displayimage=basepath+displayimagefilename;
@@ -164,5 +166,5 @@ int main() {
         smoothimagepath=basepath+scaleimage;
         blurComputationfromfile(displayimage,writeImagename,smoothimagepath);
     }
-
 }
+

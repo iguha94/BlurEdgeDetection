@@ -211,8 +211,8 @@ void NonmaximaSuppression(GradType** scalegradientImg, AngleType** angleArray,do
             }
         }
     }
-    CImg<int> localmaximaimage(Xdim,Ydim,1,1);
-    writeImage<double, int>(LocalMaxima,Xdim,Ydim,localmaximaimage,localmaximaimagename,true);
+    //CImg<int> localmaximaimage(Xdim,Ydim,1,1);
+    //writeImage<double, int>(LocalMaxima,Xdim,Ydim,localmaximaimage,localmaximaimagename,true);
 }
 
 
@@ -251,7 +251,7 @@ void HysteresisThresholding(double MinThresh, double MaxThresh, string filename)
         }
 
     CImg<unsigned short> Hysteresisimage(Xdim,Ydim,1,1);
-    writeImage<double, unsigned short>(Hysteresis,Xdim,Ydim,Hysteresisimage,filename,true);
+    writeImage<double, unsigned short>(Hysteresis,Xdim,Ydim,Hysteresisimage,filename);
 }
 
 

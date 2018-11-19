@@ -121,7 +121,7 @@ void compute_Gradient(unsigned short** arr,int Rows, int Cols, bool usigned=fals
             }
         }
     }
-    if(usigned && writeimage){
+    /*if(usigned && writeimage){
         CImg<unsigned short> scalejpgimage(Xdim,Ydim,1,1);
         writeImageunsigned< double, unsigned short>(gradientImage,Rows,Cols,scalejpgimage,gaussgradientimagename);
         //writeImagefile< unsigned short>(gradientImage,Rows,Cols,gaussgradientimagename);
@@ -131,7 +131,7 @@ void compute_Gradient(unsigned short** arr,int Rows, int Cols, bool usigned=fals
         CImg<unsigned short> scalejpgimage(Xdim,Ydim,1,1);
         writeImage< double, unsigned short>(gradientImage,Rows,Cols,scalejpgimage,gaussgradientimagename);
         gradient_color_Image(Gradientangle,gradientImage,gausscolorimagename);
-    }
+    }*/
 
 }
 

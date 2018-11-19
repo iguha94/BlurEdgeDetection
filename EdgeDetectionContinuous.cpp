@@ -28,7 +28,9 @@ int main(int argc, char* argv[]) {
     colorgaussvar=atof(argv[3]);
     maxscale=atof(argv[4]);
     snr=atof(argv[5]);
-    basepath=string(argv[6]);
+    lowerpercent=atof(argv[6]);
+    upperpercent=atof(argv[7]);
+    basepath=string(argv[8]);
 
 
     //cout<<"Enter membership value: ";
@@ -59,6 +61,9 @@ int main(int argc, char* argv[]) {
     localizedimagename=basepath+"Canny-"+curimagefile;
     dialatedimagename=basepath+"dialated-"+curimagefile;
     dividorimagename=basepath+"dividor-"+curimagefile;
+    textfile=curimagefile.substr(0,curimagefile.find("."));
+    textfile+="__"+string(argv[5])+"__"+string(argv[2]);
+    textfile+=".txt";
 
     CImg<unsigned short> jpgimage(imagefilename.c_str());
     Xdim=jpgimage.width();

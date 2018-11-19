@@ -23,6 +23,8 @@ public:
     }
 };
 
+double lowerpercent;
+double upperpercent;
 unsigned short ushrtmax=32768;
 unsigned short** image;
 double** gradImage;
@@ -43,6 +45,7 @@ string imagefilename;
 string imageId;
 string gradientimagename;
 string scaleimagename;
+string textfile;
 
 string sordergradientimagename;
 string sorderscaleimagename;

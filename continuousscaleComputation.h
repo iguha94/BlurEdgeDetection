@@ -241,9 +241,12 @@ void draw_continuous_scale(unsigned short** arr, int xc, int yc, int Rows, int C
 
 void compute_scale_Gradient_with_continuous_interpolation(unsigned short** arr,int Rows, int Cols,bool usigned=false,bool isprint=false){
     ofstream fout;
-    //string fname=basepath+"scaleList.txt";
+    string fname=basepath+textfile;
+    fout.open(fname.c_str(),ios::out|ios::app);
 
-    //fout.open(fname.c_str(),ios::app);
+    int maxgrad=-1;
+    int mingrad=65535;
+
     for(int i=0;i<Rows;i++){
         for(int j=0;j<Cols;j++){
             init_scale_params();
@@ -289,41 +292,49 @@ void compute_scale_Gradient_with_continuous_interpolation(unsigned short** arr,i
             if(scale==0.5) {gradImage[i][j]/=(3);gradImage[i][j]*=(2*scale);}
             else { gradImage[i][j]/=(prevcount); gradImage[i][j]*=(2*scale);}
             gradImage[i][j]+=gradientImage[i][j];
+            if(maxgrad<gradImage[i][j]) maxgrad=gradImage[i][j];
+            if(mingrad>gradImage[i][j]) mingrad=gradImage[i][j];
+            fout<<i<<","<<j<<","<<snr<<","<<GradientX[i][j]<<","<<GradientY[i][j]<<","<<gradientImage[i][j]<<",";
+            fout<<ScaleGradientX[i][j]/(2*scale)<<","<<ScaleGradientY[i][j]/(2*scale)<<","<<Gradientangle[i][j]<<","<<ReliableScale[i][j]<<endl;
             //Gradientangle[i][j]=computeAngle(ScaleGradientX[i][j],ScaleGradientY[i][j]);
         }
     }
     cout<<"Scales Computed\n";
-    CImg<unsigned short> scalejpgimage(Xdim,Ydim,1,1);
-    writeImage<double, unsigned short>(ReliableScale,Rows,Cols,scalejpgimage,scaleimagename,true);
-    DialateScale(percent);
-    MaximizeScale();
-    cout<<"Scales Maximized\n";
-    computeScaleBasedGradient(arr);
+    //CImg<unsigned short> scalejpgimage(Xdim,Ydim,1,1);
+    //writeImage<double, unsigned short>(ReliableScale,Rows,Cols,scalejpgimage,scaleimagename,true);
+    //DialateScale(percent);
+    //MaximizeScale();
+    //cout<<"Scales Maximized\n";
+    //computeScaleBasedGradient(arr);
 
 
-    CImg<long int> gradientjpgimage(Xdim,Ydim,1,1);
-    writeImage<double, long int>(gradImage,Rows,Cols,gradientjpgimage,gradientimagename);
+    //CImg<long int> gradientjpgimage(Xdim,Ydim,1,1);
+    //writeImage<double, long int>(gradImage,Rows,Cols,gradientjpgimage,gradientimagename);
 
-    gradient_color_Image(Gradientangle,gradImage,gradientcolorimagename,true);
+    //gradient_color_Image(Gradientangle,gradImage,gradientcolorimagename,true);
 
     int flag=1;
     double maxThreshold,minThreshold,threshold;
 
-    cout<<"*********************************\n";
-    cout<<"Localization using Canny's Method\n";
-    cout<<"*********************************\n";
-    while(flag==1){
-        cout<<"Enter Lower and Higher Hysteresis Threshold: ";
-        cin>>minThreshold>>maxThreshold;
-        cout<<"Enter Non maxima suppression threshhold: ";
-        cin>>threshold;
+    //cout<<"*********************************\n";
+    cout<<"Localization using Scale Based Method\n";
+    //cout<<"*********************************\n";
+    //while(flag==1){
+        //cout<<"Enter Lower and Higher Hysteresis Threshold: ";
+        //cin>>minThreshold>>maxThreshold;
+        //cout<<"Enter Non maxima suppression threshhold: ";
+        //cin>>threshold;
+        //double midthresh=0.5*(minThreshold+maxThreshold);
+        minThreshold=maxgrad*lowerpercent;
+        maxThreshold=maxgrad*upperpercent;
+        cout<<"Min Thresh: "<<minThreshold<<" , Max Thresh: "<<maxThreshold<<"\n";
         NonmaximaSuppression<double,double>(gradImage,Gradientangle,threshold);
         //NonmaximaSuppression_Canny<double,double>(gradImage,ScaleGradientX,ScaleGradientY,Gradientangle,threshold);
         HysteresisThresholding(minThreshold,maxThreshold,Hysteresisimagename);
-        cout<<"Press 0 to terminate else press 1. \n";
-        cin>>flag;
-    }
-    //fout.close();
+        //cout<<"Press 0 to terminate else press 1. \n";
+        //cin>>flag;
+    //}
+    fout.close();
 }
 
 #endif // CONTINUOUSSCALECOMPUTATION_H

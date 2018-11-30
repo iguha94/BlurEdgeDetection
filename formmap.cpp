@@ -8,12 +8,14 @@
 #include <iostream>
 using namespace std;
 const unsigned char red[] = { 255,0,0 };
-int main()
+int main(int argc, char* argv[])
 {
     string imagename,orgimg;
     string scaleimagename;
     int sx, sy;
     int ex, ey;
+    string basepath(argv[1]);
+    string pointsfile(argv[2]);
     cout << "Image name: ";
     cin >> scaleimagename;
     cout << "Blur scale image name: ";
@@ -25,14 +27,14 @@ int main()
     string originalimage=basepath+orgimg;
     string imagefilename=basepath+imagename;
     string circledImage=basepath+"Pointsmarked-"+orgimg;
-
+    pointsfile=basepath+pointsfile;
 
     string mapexcelfile =basepath+scaleimagename+"plotData.csv";
     
     ofstream fout;
     ifstream fin;
     fout.open(mapexcelfile.c_str());
-    fin.open("scaleMap.txt");
+    fin.open(pointsfile.c_str());
 
     CImg<unsigned short> blurscaleimage(imagefilename.c_str());
     CImg<unsigned short> scaleimagecomputed(scaleimage.c_str());

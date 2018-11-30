@@ -138,10 +138,12 @@ void compute_Gradient(unsigned short** arr,int Rows, int Cols, bool usigned=fals
 void computeScaleBasedGradient(unsigned short** arr){
     for(int x=0;x<Xdim;x++){
         for(int y=0;y<Ydim;y++){
-            int Scale=MaximizedScale[x][y];
+            int Scale=MaximizedScale[x][y]/2;
+            if(Scale<1) Scale=1;
             //cout<<"Scale : "<<Scale<<"\n";
             int ks=(Scale*3);
             if(ks%2==0) ks+=1;
+            //if(ks<3) ks=3;
             int loopcnts=ks/2;
             int mid=maxkernelsize/2;
             double GradX=0.0;

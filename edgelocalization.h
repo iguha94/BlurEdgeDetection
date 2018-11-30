@@ -178,6 +178,7 @@ void NonmaximaSuppression(GradType** scalegradientImg, AngleType** angleArray,do
             double angle=angleArray[i][j]; //in degree
             double gradientMagnitude=scalegradientImg[i][j];
             double radius=(double)((double)ReliableScale[i][j]/2.0);
+            //double radius=(double)((double)MaximizedScale[i][j]/2.0);
             double rad_angle=degtorad(angle);//convert to radian
             double start=0.5;
             LocalMaxima[i][j]=scalegradientImg[i][j];
@@ -205,8 +206,12 @@ void NonmaximaSuppression(GradType** scalegradientImg, AngleType** angleArray,do
                 }
             }
             if(!localMaxima) LocalMaxima[i][j]=0;
-            else{
+            /*lse{
                 if((sqrt(fabs(gradientImage[i][j]-Minarr[i][j])*(fabs(gradientMagnitude-LocalMinima[i][j])/(2*radius))))<threshold)
+                    LocalMaxima[i][j]=0;
+            }*/
+            else{
+                if((sqrt(fabs(gradientImage[i][j]-min1)*(fabs(gradientMagnitude-min2))))<threshold)
                     LocalMaxima[i][j]=0;
             }
         }

@@ -79,6 +79,7 @@ void MaximizeScale(){
             sort(percentile.begin(),percentile.end());
             int index=percentile.size();
             MaximizedScale[i][j]= percentile[index-1];
+            //MaximizedScale[i][j]= percentile[index/2];
         }
     }
 }
@@ -293,12 +294,15 @@ void compute_scale_Gradient_with_continuous_interpolation(unsigned short** arr,i
         }
     }
     cout<<"Scales Computed\n";
-    CImg<unsigned short> scalejpgimage(Xdim,Ydim,1,1);
-    writeImage<double, unsigned short>(ReliableScale,Rows,Cols,scalejpgimage,scaleimagename,true);
+   // CImg<unsigned short> scalejpgimage(Xdim,Ydim,1,1);
+   // writeImage<double, unsigned short>(ReliableScale,Rows,Cols,scalejpgimage,scaleimagename,true);
     DialateScale(percent);
     MaximizeScale();
     cout<<"Scales Maximized\n";
     computeScaleBasedGradient(arr);
+
+    CImg<unsigned short> scalejpgimage(Xdim,Ydim,1,1);
+    writeImage<double, unsigned short>(MaximizedScale,Rows,Cols,scalejpgimage,scaleimagename,true);
 
 
     CImg<long int> gradientjpgimage(Xdim,Ydim,1,1);

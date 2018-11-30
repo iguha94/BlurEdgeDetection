@@ -51,6 +51,55 @@ unsigned short gaussianSmoothing(unsigned short** arr, int x, int y, int dim){
     return (unsigned short)GradX;
 }
 
+void Generate_ZuckersPhantom(string displayimage,string writeImagename){
+    int window;
+    int x,y;
+    double sigma;
+    bool flag;
+    CImg<unsigned short> jpgimage(displayimage.c_str());
+    Xdim=jpgimage.width();Ydim=jpgimage.height();
+    CImg<unsigned short> smoothimage(Xdim,Ydim,1,1);
+    allocateMemory(Xdim,Ydim);
+    readImage<unsigned short>(jpgimage,image);
+    readImage<double>(jpgimage,gradImage);
+
+    for(int i=0;i<Xdim;i++){
+        for(int j=0;j<Ydim;j++){
+            image[i][j]=128;
+            gradImage[i][j]=128;
+        }
+    }
+    for(int i=Xdim/2;i<Xdim;i++){
+        for(int j=0;j<Ydim;j++){
+            image[i][j]=64;
+            gradImage[i][j]=64;
+        }
+    }
+
+    sigma=0;
+    int div1=0;
+    int div=0;
+    int prevdiv=0;
+    for(int j=0;j<Ydim;j++){
+        div+=1;
+        div1=div/10;
+        if(div1!=prevdiv){
+            prevdiv=div1;
+            sigma+=1;
+        }
+        int sigma1=(sigma)+1;
+        //if(sigma%2==0) window=8*sigma+1;
+        //else window=sigma*8;
+        window=6*sigma1+1;
+        GaussianSmoothingKernel(window,sigma1,flag);
+
+        for(int i=(Xdim/2)-sigma;i<=(Xdim/2)+sigma;i++)
+            gradImage[i][j]=gaussianSmoothing(image,i,j,window);
+
+    }
+    writeImage<double,unsigned short>(gradImage,Xdim,Ydim,smoothimage,writeImagename,true);
+}
+
 void uniformBlurring(string displayimage, string writeimage){
     int window;
     int sigma;
@@ -148,6 +197,7 @@ int main(int argc, char* argv[]) {
     cout<<"1. read scale from image\n";
     cout<<"2. read scale from file\n";
     cout<<"3. uniformBlurring\n";
+    cout<<"4. Zuckers Phantom\n";
     cout<<"Choose an option.. ";
     cin>>selection;
     switch(selection){
@@ -159,6 +209,9 @@ int main(int argc, char* argv[]) {
         break;
     case 3:
         uniformBlurring(displayimage,writeImagename);
+        break;
+    case 4:
+        Generate_ZuckersPhantom(displayimage,writeImagename);
         break;
     case 2: default:
         cout<<"Enter scale file: ";

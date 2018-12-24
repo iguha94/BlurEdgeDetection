@@ -138,7 +138,7 @@ void compute_Gradient(unsigned short** arr,int Rows, int Cols, bool usigned=fals
 void computeScaleBasedGradient(unsigned short** arr){
     for(int x=0;x<Xdim;x++){
         for(int y=0;y<Ydim;y++){
-            int Scale=MaximizedScale[x][y]/2;
+            int Scale=MaximizedScale[x][y];
             if(Scale<1) Scale=1;
             //cout<<"Scale : "<<Scale<<"\n";
             int ks=(Scale*3);
@@ -162,10 +162,11 @@ void computeScaleBasedGradient(unsigned short** arr){
                     }
                 }
             }
+
             GradientX[x][y]=GradX;
             GradientY[x][y]=GradY;
             gradImage[x][y]=squareroot<double>(GradX,GradY);
-            Gradientangle[x][y]=computeAngle(GradX,GradY);
+            //Gradientangle[x][y]=computeAngle(GradX,GradY);
             //cout<<"Computation Complete\n";
         }
     }

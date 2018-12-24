@@ -85,6 +85,8 @@ void allocateGradientImageMemory(int Rows, int Cols){
     ScaleGradientY=new double*[Rows];
     Minarr=new double*[Rows];
     MaximizedScale=new double*[Rows];
+    optimalstdv = new double*[Rows];
+    smoothgradImage=new double*[Rows];
     for(int i=0;i<Rows;i++){
         ReliableScale[i]=new double[Cols];
         gradientImage[i]=new double[Cols];
@@ -104,6 +106,8 @@ void allocateGradientImageMemory(int Rows, int Cols){
         ScaleGradientY[i]=new double[Cols];
         Minarr[i]=new double[Cols];
         MaximizedScale[i]=new double[Cols];
+        optimalstdv[i]=new double[Cols];
+        smoothgradImage[i]=new double[Cols];
         for(int j=0;j<Cols;j++){
             ReliableScale[i][j]=0;
             gradientImage[i][j]=0;
@@ -121,6 +125,8 @@ void allocateGradientImageMemory(int Rows, int Cols){
             ScaleGradientY[i][j]=0;
             Minarr[i][j]=0;
             MaximizedScale[i][j]=0;
+            optimalstdv[i][j]=0;
+            smoothgradImage[i][j]=0;
         }
     }
 

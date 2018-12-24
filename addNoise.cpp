@@ -9,8 +9,9 @@
 using namespace std;
 using namespace cimg_library;
 
-int main() {
+int main(int argc, char* argv[]) {
 
+    basepath=string(argv[1]);
     string displayimagefilename;
     cout<<"Enter the name of the Image: ";
     cin>>displayimagefilename;

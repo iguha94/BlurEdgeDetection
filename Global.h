@@ -26,6 +26,7 @@ public:
 unsigned short ushrtmax=32768;
 unsigned short** image;
 double** gradImage;
+double** smoothgradImage;
 int Xdim;
 int Ydim;
 int Xc;
@@ -73,6 +74,7 @@ double** kernelSXY;
 double** Dividorarr;
 double** Minarr;
 double** MaximizedScale;
+double** optimalstdv;
 
 double** GradientX;
 double** GradientY;

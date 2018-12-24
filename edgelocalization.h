@@ -206,14 +206,16 @@ void NonmaximaSuppression(GradType** scalegradientImg, AngleType** angleArray,do
                 }
             }
             if(!localMaxima) LocalMaxima[i][j]=0;
-            /*lse{
-                if((sqrt(fabs(gradientImage[i][j]-Minarr[i][j])*(fabs(gradientMagnitude-LocalMinima[i][j])/(2*radius))))<threshold)
-                    LocalMaxima[i][j]=0;
-            }*/
-            else{
+            //else if(radius>=maxscale) {
+              else if((sqrt(fabs(gradientImage[i][j]-Minarr[i][j])*(fabs(gradientMagnitude-LocalMinima[i][j])/(2*radius))))<threshold)
+                //cout<<"Here\n";    
+		LocalMaxima[i][j]=0;
+            //}
+            /*else{
                 if((sqrt(fabs(gradientImage[i][j]-min1)*(fabs(gradientMagnitude-min2))))<threshold)
                     LocalMaxima[i][j]=0;
-            }
+                
+            }*/
         }
     }
     CImg<int> localmaximaimage(Xdim,Ydim,1,1);

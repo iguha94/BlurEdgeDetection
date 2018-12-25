@@ -22,20 +22,21 @@ public:
     }
 };
 
-int main(){
+int main(int argc, char*argv[]){
     string imagename;
+    basepath=string(argv[1]);
     int interval;
     cout<<"Enter ImageName: ";
     cin>>imagename;
-    cout<<"Enter sampling interval (square)";
-    cin>>interval;
+   // cout<<"Enter sampling interval (square)";
+    //cin>>interval;
     int range;
     cout<<"Maximum scale";
     cin>>range;
     string imagefile=basepath+imagename;
-    string blurimagefile=basepath+"blur3.png";
+    string blurimagefile=basepath+"blur_"+imagename;
     fstream fin;
-    fin.open("samplepoints.txt");
+    fin.open("blurpoints.txt");
 
     CImg<unsigned short> image(imagefile.c_str());
     CImg<unsigned short> blurimage(image.width(), image.height(), 1, 1, 0);;
@@ -59,6 +60,7 @@ int main(){
 
         while(fin>>x>>y>>value){
             //if(value>3 && value<8) value+=5;
+            cout<<"x: "<<x<<" y: "<<y<<" value: "<<value<<"\n";
             CPoint* cp=new CPoint(x,y,value);
             CPoint cp1(x,y,value);
             controlpoints.push_back(cp1);
@@ -66,7 +68,7 @@ int main(){
             blurimage(x,y)=value;
         }
 
-    for(int i=0;i<image.width();i+=interval){
+    /*for(int i=0;i<image.width();i+=interval){
         for(int j=0;j<image.height();j+=interval){
             long long int index=calculateIndex(i,j,image.width(),image.height());
             if(pointsmap.find(index)!=pointsmap.end()){
@@ -95,7 +97,7 @@ int main(){
                //blurimage(i,j)=maximum;
             }
         }
-    }
+    }*/
 
     blurimage.display();
     blurimage.save_tiff(blurimagefile.c_str());

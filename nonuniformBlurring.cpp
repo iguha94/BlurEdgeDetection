@@ -140,7 +140,7 @@ void blurComputationfromimage(string displayimage, string smoothimagepath, strin
     for(int i=0;i<Xdim;i++){
         for(int j=0;j<Ydim;j++){
             flag=false;
-            double sigma=(double)((double)gradientImage[i][j]/10.0);
+            double sigma=(double)((double)gradientImage[i][j]/5.0);
             int sigma1=(sigma)+1;
             //if(sigma%2==0) window=8*sigma+1;
             //else window=sigma*8;

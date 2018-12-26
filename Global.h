@@ -23,6 +23,8 @@ public:
     }
 };
 
+string edgepath;
+string textpath;
 double lowerpercent;
 double upperpercent;
 unsigned short ushrtmax=32768;

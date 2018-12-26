@@ -1,3 +1,4 @@
+*.jpeg
 *.exe*
 *.pro*
 *.txt*
@@ -5,4 +6,8 @@
 *.cpp~
 *.o
 Makefile
-
+Model/i
+*.jpg
+.DS_Store
+*.png
+*.jpg

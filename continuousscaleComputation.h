@@ -19,12 +19,10 @@ void init_scale_params(){
     gradientvar=0;
     TotalweightX=TotalweightY=0;
     curgradX=curgradY=0;
-
 }
 
 void drawCirclePoints(double** arr, int r, int xc, int yc, int curx, int cury, int Rows, int Cols)
 {
-
     if(xc - curx >= 0 && yc - cury >= 0 /*&& ReliableScale[xc-curx][yc-cury]>arr[xc][yc]*/ ) {
         percentile.push_back( arr[xc-curx][yc-cury]);
     }
@@ -241,8 +239,8 @@ void draw_continuous_scale(unsigned short** arr, int xc, int yc, int Rows, int C
 
 void compute_scale_Gradient_with_continuous_interpolation(unsigned short** arr,int Rows, int Cols,bool usigned=false,bool isprint=false){
     ofstream fout;
-    string fname=basepath+textfile;
-    fout.open(fname.c_str(),ios::out|ios::app);
+    string fname=textpath+textfile;
+    fout.open(fname.c_str(),ios::out);
 
     int maxgrad=-1;
     int mingrad=65535;

@@ -31,6 +31,8 @@ int main(int argc, char* argv[]) {
     lowerpercent=atof(argv[6]);
     upperpercent=atof(argv[7]);
     basepath=string(argv[8]);
+    edgepath=string(argv[9]);
+    textpath=string(argv[10]);
 
 
     //cout<<"Enter membership value: ";
@@ -56,7 +58,7 @@ int main(int argc, char* argv[]) {
     gradientcolorimagename=basepath+"scale-gradientcolor-"+curimagefile;
     gausscolorimagename=basepath+"point-gradient-color-"+curimagefile;
     localmaximaimagename=basepath+"localmaxima-"+curimagefile;
-    Hysteresisimagename=basepath+"scalebasededge_"+curimagefile;
+    Hysteresisimagename=edgepath+"scalebasededge_"+curimagefile;
     secondderivativeimagename=basepath+"sd-"+curimagefile;
     localizedimagename=basepath+"Canny-"+curimagefile;
     dialatedimagename=basepath+"dialated-"+curimagefile;

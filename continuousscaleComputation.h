@@ -27,27 +27,35 @@ void drawCirclePoints(double** arr, int r, int xc, int yc, int curx, int cury, i
 
     if(xc - curx >= 0 && yc - cury >= 0 /*&& ReliableScale[xc-curx][yc-cury]>arr[xc][yc]*/ ) {
         percentile.push_back( arr[xc-curx][yc-cury]);
+        scalearr[scalecount++]=arr[xc-curx][yc-cury];
     }
     if(xc - curx >= 0 && yc + cury < Cols /*&& ReliableScale[xc - curx][yc + cury]>arr[xc][yc]*/) {
         percentile.push_back( arr[xc - curx][yc + cury]);
+        scalearr[scalecount++]=arr[xc - curx][yc + cury];
     }
     if(xc + curx < Rows && yc - cury >= 0 /*&& ReliableScale[xc + curx][yc - cury]>arr[xc][yc]*/) {
         percentile.push_back(arr[xc + curx][yc - cury]);
+        scalearr[scalecount++]=arr[xc + curx][yc - cury];
     }
     if(yc + cury < Cols && xc + curx < Rows /*&& ReliableScale[xc + curx][yc + cury]>arr[xc][yc]*/) {
         percentile.push_back(arr[xc + curx][yc + cury]);
+        scalearr[scalecount++]=arr[xc + curx][yc + cury];
     }
     if(xc - cury >= 0 && yc - curx >= 0 /*&& ReliableScale[xc - cury][yc - curx]>arr[xc][yc]*/ ) {
         percentile.push_back(arr[xc - cury][yc - curx]);
+        scalearr[scalecount++]=arr[xc - cury][yc - curx];
     }
     if(yc - curx >= 0 && xc + cury < Rows /*&& ReliableScale[xc + cury][yc - curx]>arr[xc][yc]*/ ) {
         percentile.push_back(arr[xc + cury][yc - curx]);
+        scalearr[scalecount++]=arr[xc + cury][yc - curx];
     }
     if(xc + cury < Rows && yc + curx < Cols /*&& ReliableScale[xc + cury][yc + curx]>arr[xc][yc]*/) {
         percentile.push_back(arr[xc + cury][yc + curx]);
+        scalearr[scalecount++]=arr[xc + cury][yc + curx];
     }
     if(xc - cury >= 0 && yc + curx < Cols /*&& ReliableScale[xc - cury][yc + curx]>arr[xc][yc]*/) {
         percentile.push_back(arr[xc - cury][yc + curx]);
+        scalearr[scalecount++]=arr[xc - cury][yc + curx];
     }
 }
 
@@ -188,6 +196,33 @@ void FinaOptimalScaleforEdge(double** arr, int rows, int cols){
             }
             //cout<<"Processed Pixel: "<<i<<" , "<<j<<" Scale: "<<stdv<<endl;
             optimalstdv[i][j]=stdv;
+        }
+    }
+}
+
+void VarianceofScale(){
+    for(int i=0;i<Xdim;i++){
+        for(int j=0;j<Ydim;j++){
+            scalearr=new double[400];
+            percentile.clear();
+            scalecount=0;
+            int r=(int)(ReliableScale[i][j]/2);
+            drawCircle(gradImage,i,j,Xdim,Ydim,r);
+            if(scalecount==0) scalecount=1;
+            double mean=0;
+            for(int k=0;k<scalecount;k++){
+                mean+=scalearr[k];
+            }
+            mean/=scalecount;
+            double var=0;
+            for(int k=0;k<scalecount;k++){
+                var+=pow((scalearr[k]-mean),2);
+            }
+
+            var/=scalecount;
+
+            Dividorarr[i][j]=var;
+            delete scalearr;
         }
     }
 }
@@ -350,8 +385,8 @@ void draw_continuous_scale(unsigned short** arr, int xc, int yc, int Rows, int C
 void compute_scale_Gradient_with_continuous_interpolation(unsigned short** arr,int Rows, int Cols,bool usigned=false,bool isprint=false){
     ofstream fout;
     //string fname=basepath+"scaleList.txt";
-
     //fout.open(fname.c_str(),ios::app);
+    maxgradient=INT_MIN;
     for(int i=0;i<Rows;i++){
         for(int j=0;j<Cols;j++){
             init_scale_params();
@@ -390,7 +425,6 @@ void compute_scale_Gradient_with_continuous_interpolation(unsigned short** arr,i
                 totalgradient1=squareroot<double>(TotalweightX/2,TotalweightY/2);
                 totalgradient=curgrad/(snr*totalpoints);
                 gradienthresh/=sqrt(totalpoints);
-                //Minarr[i][j]=minimumGradient;
             }
 
 
@@ -399,31 +433,36 @@ void compute_scale_Gradient_with_continuous_interpolation(unsigned short** arr,i
 
             //if(scale==maxscale) gradImage[i][j]/=(2*scale);
             gradImage[i][j]+=gradientImage[i][j];
+            if(gradImage[i][j]>maxgradient) maxgradient=gradImage[i][j];
             //Gradientangle[i][j]=computeAngle(ScaleGradientX[i][j],ScaleGradientY[i][j]);
         }
     }
 
     CImg<unsigned short> scalejpgimage(Xdim,Ydim,1,1);
     writeImage<double, unsigned short>(ReliableScale,Rows,Cols,scalejpgimage,scaleimagename,true);
-    DialateScale(percent);
+    //DialateScale(percent);
     //OptimizeScale();
-    MaxmizeScale();
+    //MaxmizeScale();
+
+    VarianceofScale();
+    cout<<"Computed Scale Variance\n";
+
     //FinaOptimalScaleforEdge(gradImage,Rows,Cols);
     smoothGradient(gradImage,Xdim,Ydim);
-    cout<<"Scales Maximized\n";
+    cout<<"Gradient Smoothed\n";
     //computeScaleBasedGradient(arr);
 
-    //CImg<unsigned short> scalejpgimage(Xdim,Ydim,1,1);
-    //writeImage<double, unsigned short>(optimalstdv,Rows,Cols,scalejpgimage,scaleimagename,true);
+    CImg<unsigned short> scalearrjpgimage(Xdim,Ydim,1,1);
+    writeImage<double, unsigned short>(Dividorarr,Rows,Cols,scalearrjpgimage,"carimage.jpg",true);
 
 
     CImg<long int> gradientjpgimage(Xdim,Ydim,1,1);
     writeImage<double, long int>(gradImage,Rows,Cols,gradientjpgimage,gradientimagename);
 
-    gradient_color_Image(Gradientangle,gradImage,gradientcolorimagename,true);
+    gradient_color_Image(Gradientangle,gradImage,gradientcolorimagename,false);
 
     int flag=1;
-    double maxThreshold,minThreshold,threshold;
+    double maxThreshold,minThreshold,threshold,threshold2;
 
     cout<<"*********************************\n";
     cout<<"Localization using Canny's Method\n";
@@ -431,10 +470,13 @@ void compute_scale_Gradient_with_continuous_interpolation(unsigned short** arr,i
     while(flag==1){
         cout<<"Enter Lower and Higher Hysteresis Threshold: ";
         cin>>minThreshold>>maxThreshold;
-        cout<<"Enter Non maxima suppression threshhold: ";
+        cout<<"Enter Variance threshhold: ";
         cin>>threshold;
-        NonmaximaSuppression<double,double>(smoothgradImage,Gradientangle,threshold);
-        //NonmaximaSuppression_Canny<double,double>(gradientImage,GradientX,GradientY,Gradientangle,threshold);
+        cout<<"Enter Non maxima suppression threshhold: ";
+        cin>>threshold2;
+        SoftMaxComputation<double,double>(smoothgradImage,Gradientangle,maxgradient);
+        NonmaximaSuppression<double,double>(softmax,Gradientangle,threshold,threshold2);
+        //NonmaximaSuppression_Canny<double,double>(softmax,ScaleGradientNewX,ScaleGradientNewY,Gradientangle,threshold2);
         HysteresisThresholding(minThreshold,maxThreshold,Hysteresisimagename);
         cout<<"Press 0 to terminate else press 1. \n";
         cin>>flag;

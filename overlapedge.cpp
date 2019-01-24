@@ -10,7 +10,7 @@ using namespace cimg_library;
 int r,g,b;
 void ImposeonGrayImage(string imagename, string skeletonname){
 
-    string rgb_image_name=basepath+"overlapped-"+imagename;
+    string rgb_image_name=basepath+"overlapped-"+skeletonname;
     imagename=basepath+imagename;
     skeletonname=basepath+skeletonname;
 
@@ -21,7 +21,7 @@ void ImposeonGrayImage(string imagename, string skeletonname){
     RGBimage=convert_to_RGB_image<unsigned short>(jpgimage);
     CImg<unsigned short> skeljpgimage(skeletonname.c_str());
     cimg_forXY(skeljpgimage,x,y){
-        if(x>2 && y>2 && x<Xdim-3 && y<Ydim-3 && skeljpgimage(x,y)>1){
+        if(x>2 && y>2 && x<Xdim-3 && y<Ydim-3 && skeljpgimage(x,y)>200){
             RGBimage(x,y,0,0)=(r);
             RGBimage(x,y,0,1)=(g);
             RGBimage(x,y,0,2)=(b);
@@ -33,9 +33,11 @@ void ImposeonGrayImage(string imagename, string skeletonname){
 
 void ImposeonRGBImage(string imagename, string skeletonname){
 
-    string rgb_image_name=basepath+"overlapped-"+imagename;
+    string rgb_image_name=basepath+"overlapped-"+skeletonname;
     imagename=basepath+imagename;
     skeletonname=basepath+skeletonname;
+
+    cout<<"RGB Name: "<<rgb_image_name<<"\n";
 
     CImg<unsigned short> RGBimage(imagename.c_str());
     Xdim=RGBimage.width();

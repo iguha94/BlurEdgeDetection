@@ -36,7 +36,8 @@ int main(int argc, char*argv[]){
     string imagefile=basepath+imagename;
     string blurimagefile=basepath+"blur_"+imagename;
     fstream fin;
-    fin.open("blurpoints.txt");
+    string blurpointsfile=basepath+"BlurPoints.txt";
+    fin.open(blurpointsfile.c_str());
 
     CImg<unsigned short> image(imagefile.c_str());
     CImg<unsigned short> blurimage(image.width(), image.height(), 1, 1, 0);;
@@ -59,7 +60,8 @@ int main(int argc, char*argv[]){
 //    }
 
         while(fin>>x>>y>>value){
-            //if(value>3 && value<8) value+=5;
+            if(value>=15 ) value+=10;
+            //else if(value>=10 ) value+=30;
             cout<<"x: "<<x<<" y: "<<y<<" value: "<<value<<"\n";
             CPoint* cp=new CPoint(x,y,value);
             CPoint cp1(x,y,value);

@@ -176,10 +176,8 @@ void SoftMaxComputation(GradType** scalegradientImg, AngleType** angleArray,Grad
     for(int i=0;i<Xdim;i++){
         for(int j=0;j<Ydim;j++){
             double angle=angleArray[i][j]; //in degree
-            double gradientMagnitude=scalegradientImg[i][j];
             double radius=(double)((double)ReliableScale[i][j]/2.0);
             double rad_angle=degtorad(angle);//convert to radian
-            double start=0.5;
             softmax[i][j]=scalegradientImg[i][j];
             double max=INT_MIN;
 
@@ -200,7 +198,7 @@ void SoftMaxComputation(GradType** scalegradientImg, AngleType** angleArray,Grad
             double stdv=(max/2.0)>0?max/2.0:1;
             double softmean=max;
             double mu=colorgaussian(softmax[i][j],softmean,stdv);
-            double sigval=1;//ComputeSigmoid(softmax[i][j],maximumval);//ComputeDecay(maximumval,softmax[i][j],1); 
+            double sigval=ComputeSigmoid(softmax[i][j],maximumval);//ComputeDecay(maximumval,softmax[i][j],1);
             /*if(ReliableScale[i][j]==31){
             cout<<"Decay: "<<sigval<<",";
             cout<<"Max Value: "<<maximumval<<" , Scale: "<<ReliableScale[i][j]<<"\n";
@@ -208,6 +206,7 @@ void SoftMaxComputation(GradType** scalegradientImg, AngleType** angleArray,Grad
             softmax[i][j]=softmax[i][j]*mu*sigval;
             ScaleGradientNewX[i][j]=ScaleGradientX[i][j]*mu*sigval;
             ScaleGradientNewY[i][j]=ScaleGradientY[i][j]*mu*sigval;
+            Gradientangle[i][j]=computeAngle(ScaleGradientX[i][j],ScaleGradientY[i][j]);
         }
     }
     CImg<int> softlocalmaximaimage(Xdim,Ydim,1,1);

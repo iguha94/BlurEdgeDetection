@@ -44,7 +44,7 @@ void ImposeonRGBImage(string imagename, string skeletonname){
     Ydim=RGBimage.height();
     CImg<unsigned short> skeljpgimage(skeletonname.c_str());
     cimg_forXY(skeljpgimage,x,y){
-        if(skeljpgimage(x,y)>1){
+        if(skeljpgimage(x,y)>0){
             RGBimage(x,y,0,0)=(r);
             RGBimage(x,y,0,1)=(g);
             RGBimage(x,y,0,2)=(b);

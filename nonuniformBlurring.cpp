@@ -140,7 +140,11 @@ void blurComputationfromimage(string displayimage, string smoothimagepath, strin
     for(int i=0;i<Xdim;i++){
         for(int j=0;j<Ydim;j++){
             flag=false;
-            double sigma=(double)((double)gradientImage[i][j]/5.0);
+            double sigma;
+            //if(gradientImage[i][j]<50) sigma=(double)((double)gradientImage[i][j]/8.0);
+            //else
+            sigma=(double)((double)gradientImage[i][j]/5.0);
+            //if(sigma<3) sigma=1;
             int sigma1=(sigma)+1;
             //if(sigma%2==0) window=8*sigma+1;
             //else window=sigma*8;
@@ -188,21 +192,21 @@ int main(int argc, char* argv[]) {
     string scaleimage;
     string smoothimagepath;
     basepath=string(argv[1]);
-    cout<<"Display Image: ";
+    cout<<"Original Image Name: ";
     cin>>displayimagefilename;
     string displayimage=basepath+displayimagefilename;
     string writeImagename=basepath+"smooth-"+displayimagefilename;
 
     int selection;
-    cout<<"1. read scale from image\n";
-    cout<<"2. read scale from file\n";
+    cout<<"1. read Blur Field from image\n";
+    cout<<"2. read Blur Field from file\n";
     cout<<"3. uniformBlurring\n";
     cout<<"4. Zuckers Phantom\n";
     cout<<"Choose an option.. ";
     cin>>selection;
     switch(selection){
     case 1:
-        cout<<"Enter scale Image: ";
+        cout<<"Enter Blur Field Image Name: ";
         cin>>scaleimage;
         smoothimagepath=basepath+scaleimage;
         blurComputationfromimage(displayimage,smoothimagepath,writeImagename);

@@ -54,7 +54,7 @@ int main(int argc, char* argv[]) {
         stringstream ss;
         ss << cnr[i];
         string str = ss.str();
-        string outputfile2=basepath+"SNR-"+str+"-"+displayimagefilename;
+        string outputfile2=basepath+"SNR-"+str+"-"+displayimagefilename.substr(0,displayimagefilename.find_first_of('.'))+".tif";
         CImg<unsigned short> jpgimage(displayimage.c_str());
         CImg<unsigned short> noisyimage(noisyImagename.c_str());
         cimg_forXY(jpgimage,x,y)

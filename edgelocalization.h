@@ -161,9 +161,9 @@ double NonmaximaSuppression_Canny(GradType** scalegradientImg,GradType** sgradX,
                 gm=sqrt(fabs(gradientMagnitude-val1)*fabs(gradientMagnitude-val2));
                 if(val1>gradientMagnitude || val2>gradientMagnitude) LocalMaxima[i][j]=0;
             }
-           // if(LocalMaxima[i][j]!=0){
-           //     if((sqrt(fabs(gradientImage[i][j]-Minarr[i][j]))*(fabs(gradientMagnitude-LocalMinima[i][j])/(2*r)))<threshold) LocalMaxima[i][j]=0;
-           // }
+            if(LocalMaxima[i][j]!=0){
+                if(r>basesig && (sqrt(fabs(gradientImage[i][j]-Minarr[i][j]))*(fabs(gradientMagnitude-LocalMinima[i][j])/(2*r)))<threshold) LocalMaxima[i][j]=0;
+            }
         }
     }
 
@@ -172,12 +172,55 @@ double NonmaximaSuppression_Canny(GradType** scalegradientImg,GradType** sgradX,
 }
 
 template<class GradType, class AngleType>
-void NonmaximaSuppression(GradType** scalegradientImg, AngleType** angleArray,double threshold){
+void SoftMaxComputation(GradType** scalegradientImg, AngleType** angleArray,GradType maximumval){
+    for(int i=0;i<Xdim;i++){
+        for(int j=0;j<Ydim;j++){
+            double angle=angleArray[i][j]; //in degree
+            double radius=(double)((double)ReliableScale[i][j]/2.0);
+            double rad_angle=degtorad(angle);//convert to radian
+            softmax[i][j]=scalegradientImg[i][j];
+            double max=INT_MIN;
+
+            for(double r=-radius;r<=-0.5;r+=1){
+                double xcoord=i-r*cos(rad_angle);
+                double ycoord=j+r*sin(rad_angle);
+                double interpolated_gradient_value=Bilinear_interpolation(scalegradientImg,xcoord,ycoord); //produces best result
+                if(interpolated_gradient_value>max){max=interpolated_gradient_value;}
+            }
+
+            for(double r=0.5;r<=radius;r+=1){
+                double xcoord=i-r*cos(rad_angle);
+                double ycoord=j+r*sin(rad_angle);
+                double interpolated_gradient_value=Bilinear_interpolation(scalegradientImg,xcoord,ycoord);
+                if(interpolated_gradient_value>max){max=interpolated_gradient_value;}
+            }
+
+            double stdv=(max/2.0)>0?max/2.0:1;
+            double softmean=max;
+            double mu=colorgaussian(softmax[i][j],softmean,stdv);
+            double sigval=ComputeSigmoid(softmax[i][j],maximumval);//ComputeDecay(maximumval,softmax[i][j],1);
+            /*if(ReliableScale[i][j]==31){
+            cout<<"Decay: "<<sigval<<",";
+            cout<<"Max Value: "<<maximumval<<" , Scale: "<<ReliableScale[i][j]<<"\n";
+            }*/
+            softmax[i][j]=softmax[i][j]*mu*sigval;
+            ScaleGradientNewX[i][j]=ScaleGradientX[i][j]*mu*sigval;
+            ScaleGradientNewY[i][j]=ScaleGradientY[i][j]*mu*sigval;
+            Gradientangle[i][j]=computeAngle(ScaleGradientX[i][j],ScaleGradientY[i][j]);
+        }
+    }
+    CImg<int> softlocalmaximaimage(Xdim,Ydim,1,1);
+    writeImage<double, int>(softmax,Xdim,Ydim,softlocalmaximaimage,softlocalmaximaimagename);
+}
+
+template<class GradType, class AngleType>
+void NonmaximaSuppression(GradType** scalegradientImg, AngleType** angleArray,double threshold,double threshold2){
     for(int i=0;i<Xdim;i++){
         for(int j=0;j<Ydim;j++){
             double angle=angleArray[i][j]; //in degree
             double gradientMagnitude=scalegradientImg[i][j];
             double radius=(double)((double)ReliableScale[i][j]/2.0);
+            //double radius=(double)((double)MaximizedScale[i][j]/2.0);
             double rad_angle=degtorad(angle);//convert to radian
             double start=0.5;
             LocalMaxima[i][j]=scalegradientImg[i][j];
@@ -205,14 +248,20 @@ void NonmaximaSuppression(GradType** scalegradientImg, AngleType** angleArray,do
                 }
             }
             if(!localMaxima) LocalMaxima[i][j]=0;
-            else{
-                if((sqrt(fabs(gradientImage[i][j]-Minarr[i][j])*(fabs(gradientMagnitude-LocalMinima[i][j])/(2*radius))))<threshold)
+            else if(radius>basesig && (Dividorarr[i][j]/radius)<threshold || ((sqrt(fabs(gradientImage[i][j]-Minarr[i][j])*(fabs(gradientMagnitude-LocalMinima[i][j])/(2*radius))))<threshold2))
+                //cout<<"Here\n";    
+		        LocalMaxima[i][j]=0;
+            
+            //}
+            /*else{
+                if((sqrt(fabs(gradientImage[i][j]-min1)*(fabs(gradientMagnitude-min2))))<threshold)
                     LocalMaxima[i][j]=0;
-            }
+                
+            }*/
         }
     }
     CImg<int> localmaximaimage(Xdim,Ydim,1,1);
-    writeImage<double, int>(LocalMaxima,Xdim,Ydim,localmaximaimage,localmaximaimagename,true);
+    writeImage<double, int>(LocalMaxima,Xdim,Ydim,localmaximaimage,localmaximaimagename);
 }
 
 
@@ -253,6 +302,4 @@ void HysteresisThresholding(double MinThresh, double MaxThresh, string filename)
     CImg<unsigned short> Hysteresisimage(Xdim,Ydim,1,1);
     writeImage<double, unsigned short>(Hysteresis,Xdim,Ydim,Hysteresisimage,filename,true);
 }
-
-
 #endif // EDGELOCALIZATION_H

@@ -10,6 +10,24 @@ using namespace std;
 
 unsigned short minimum(unsigned short a, unsigned short b) {return a>b?a:b;}
 
+double ComputeSigmoid(double val,double maximumval){
+    double mid = maximumval/2.0;
+    double gradval=val-mid;
+    gradval/=mid;
+    gradval*=5;
+
+    double denom=1.0+exp(-fabs(gradval));
+    double v=1/denom;
+    if(gradval<0) return 1-v;
+    return v;
+}
+
+double ComputeDecay(double rate,double val, double k){
+    if(val>=rate) {return 0;}
+
+    return exp( k - (k / (1 - pow((val/rate),2))));
+}
+
 double  gaussian(double intensity,double mean, double var){
     double power=((intensity-mean)*(intensity-mean))/(2*var*var);
     double gaussval=exp(-power);

@@ -30,7 +30,7 @@ int main(int argc, char* argv[]) {
     snr=atof(argv[5]);
     basepath=string(argv[6]);
 
-
+    basesig=gaussgradvar;
     //cout<<"Enter membership value: ";
     //cin>>memconf;
 
@@ -54,6 +54,7 @@ int main(int argc, char* argv[]) {
     gradientcolorimagename=basepath+"scale-gradientcolor-"+curimagefile;
     gausscolorimagename=basepath+"point-gradient-color-"+curimagefile;
     localmaximaimagename=basepath+"localmaxima-"+curimagefile;
+    softlocalmaximaimagename=basepath+"softlocalmaxima-"+curimagefile;
     Hysteresisimagename=basepath+"scalebasededge_"+curimagefile;
     secondderivativeimagename=basepath+"sd-"+curimagefile;
     localizedimagename=basepath+"Canny-"+curimagefile;

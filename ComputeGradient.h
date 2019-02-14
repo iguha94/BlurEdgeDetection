@@ -129,7 +129,7 @@ void compute_Gradient(unsigned short** arr,int Rows, int Cols, bool usigned=fals
     }
     else if(!usigned && writeimage){
         CImg<unsigned short> scalejpgimage(Xdim,Ydim,1,1);
-        writeImage< double, unsigned short>(gradientImage,Rows,Cols,scalejpgimage,gaussgradientimagename);
+        writeImage< double, unsigned short>(gradientImage,Rows,Cols,scalejpgimage,gaussgradientimagename,true);
         gradient_color_Image(Gradientangle,gradientImage,gausscolorimagename);
     }
 

@@ -60,7 +60,7 @@ int main(int argc, char*argv[]){
 //    }
 
         while(fin>>x>>y>>value){
-            if(value>=15 ) value+=10;
+            //if(value>=15 ) value+=10;
             //else if(value>=10 ) value+=30;
             cout<<"x: "<<x<<" y: "<<y<<" value: "<<value<<"\n";
             CPoint* cp=new CPoint(x,y,value);

@@ -15,7 +15,7 @@ int main(int argc, char* argv[]){
     string basePath=argv[1];
     string targetDirectory=argv[2];
 
-    for(int i=1;i<=12;i++){ //For each phantoms
+    for(int i=13;i<=15;i++){ //For each phantoms
 
         stringstream ss;
         ss << i;

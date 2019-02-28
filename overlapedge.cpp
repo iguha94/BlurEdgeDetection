@@ -28,7 +28,7 @@ void ImposeonGrayImage(string imagename, string skeletonname){
         }
     }
     RGBimage.save_tiff(rgb_image_name.c_str());
-    RGBimage.display();
+    //RGBimage.display();
 }
 
 void ImposeonRGBImage(string imagename, string skeletonname){
@@ -51,7 +51,7 @@ void ImposeonRGBImage(string imagename, string skeletonname){
         }
     }
     RGBimage.save_tiff(rgb_image_name.c_str());
-    RGBimage.display();
+    //RGBimage.display();
 }
 
 int main(int argc, char*argv[]){

@@ -63,7 +63,7 @@ sheet3.write(0,9,'EZ Kernel stdv')
 sheet3.write(0,10,'ScaleBased Kernel stdv')
 sheet3.write(0,11,'Canny Kernel stdv')
 
-for i in range(1,13):
+for i in range(1,16):
     id=str(i)
     basedirectory=basepath+'Phantom'+id+'/'
     for j in range(0,3):
@@ -74,19 +74,7 @@ for i in range(1,13):
         dataListA=[]
         dataListB=[]
         ezcorrfile=datadirectory+'EZCorr.csv'
-        
-        '''
-        readbook=xlrd.open_workbook(ezcorrfile)    
-        rsheet=readbook.sheet_by_index(0)
-        
-        for r in range(rsheet.nrows):
-            print(r)
-            dataListA.append(rsheet.cell_value(r,2))
-        
-        for r in range(rsheet.nrows):
-            dataListB.append(rsheet.cell_value(r,3))
-            
-        '''
+
         with open(ezcorrfile, mode='r') as csv_file:
             csv_reader=csv.DictReader(csv_file)
             for row in csv_reader:
@@ -105,17 +93,7 @@ for i in range(1,13):
         dataListA=[]
         dataListB=[]
         scalecorrfile=datadirectory+'ScaleCorr.csv'
-        
-        '''
-        readbook=xlrd.open_workbook(scalecorrfile)    
-        rsheet=readbook.sheet_by_index(0)
-        
-        for r in range(rsheet.nrows): 
-            dataListA.append(rsheet.cell_value(r,2))
-        
-        for r in range(rsheet.nrows): 
-            dataListB.append(rsheet.cell_value(r,3))
-        '''
+
         with open(scalecorrfile, mode='r') as csv_file:
             csv_reader=csv.DictReader(csv_file)
             for row in csv_reader:
@@ -131,7 +109,7 @@ for i in range(1,13):
         sheet.write(i,5,round(np.mean(X),2))
         sheet.write(i,6,round(np.mean(Y),2))
     
-wb.save(basepath+'CorrelationAllNew.xls') 
+wb.save(basepath+'CorrelationAll15.xls')
         
         
         

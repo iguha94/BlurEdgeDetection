@@ -246,7 +246,6 @@ int readImage(CImg<unsigned short> cimg,T1** arr,bool isprint=false){
     return 1;
 }
 
-
 void readImagefile(string filename,unsigned short** arr,bool isprint=false){
     ifstream fin;
     fin.open(filename.c_str());

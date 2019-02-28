@@ -17,7 +17,7 @@ int main(int argc, char* argv[]){
     for(int i=0;i<3;i++){
         string noiselevel=NoiseLevel[i];
 
-        for(int j=1;j<=12;j++){
+        for(int j=13;j<=15;j++){
             stringstream ss;
             ss << j;
             string id = ss.str();
@@ -29,13 +29,13 @@ int main(int argc, char* argv[]){
 
             string TargetPath=basePath+targetDirectory+"/Phantom"+id+"/"+noiselevel+"/";
 
-           /* string command="cp "+sourceScaleimage+" "+TargetPath;
+            string command="cp "+sourceScaleimage+" "+TargetPath;
             system(command.c_str());
             command="cp "+sourceEdgeimage+" "+TargetPath;
             system(command.c_str());
             command="cp "+sourceBlurScaleFile+" "+TargetPath;
-            system(command.c_str());*/
-            string command="cp "+jpgfile+" "+TargetPath;
+            system(command.c_str());
+            command="cp "+jpgfile+" "+TargetPath;
             system(command.c_str());
         }
     }

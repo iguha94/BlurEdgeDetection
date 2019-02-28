@@ -31,6 +31,8 @@ int Xdim;
 int Ydim;
 int Xc;
 int Yc;
+int paddingsize=80;
+int increment=paddingsize/2;
 int intermediatescale;
 double totalgradient=0;
 double totalgradient1=0;

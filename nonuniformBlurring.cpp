@@ -46,6 +46,9 @@ unsigned short gaussianSmoothing(unsigned short** arr, int x, int y, int dim){
             if(x+i>=0&&y+j>=0&&x+i<Xdim&&y+j<Ydim){
                 GradX=GradX+arr[x+i][y+j]*kernelX[i+loopcnt][j+loopcnt];
             }
+            else{
+                 GradX=GradX+255*kernelX[i+loopcnt][j+loopcnt];
+            }
         }
     }
     return (unsigned short)GradX;
@@ -125,11 +128,13 @@ void uniformBlurring(string displayimage, string writeimage){
     writeImage<double,unsigned short>(gradImage,Xdim,Ydim,smoothjpg,writeimage);
 }
 
-void blurComputationfromimage(string displayimage, string smoothimagepath, string writeImagename){
+void blurComputationfromimage(string displayimage, string smoothimagepath, string writeImagename,string outputfilename,double sigdivisor){
     int window;
     int x,y;
     double sigma;
     bool flag;
+    fstream fout;
+    fout.open(outputfilename.c_str(),ios::out);
     CImg<unsigned short> jpgimage(displayimage.c_str());
     CImg<unsigned short> smoothimage(smoothimagepath.c_str());
     Xdim=jpgimage.width();Ydim=jpgimage.height();
@@ -141,11 +146,13 @@ void blurComputationfromimage(string displayimage, string smoothimagepath, strin
         for(int j=0;j<Ydim;j++){
             flag=false;
             double sigma;
-            //if(gradientImage[i][j]<50) sigma=(double)((double)gradientImage[i][j]/8.0);
+            //if(gradientImage[i][j]<40) sigma=(double)((double)gradientImage[i][j]/12.0);
             //else
-            sigma=(double)((double)gradientImage[i][j]/5.0);
+
+            sigma=(double)((double)gradientImage[i][j]/sigdivisor); //Phantom3/=6
             //if(sigma<3) sigma=1;
             int sigma1=(sigma)+1;
+            fout<<i<<" "<<j<<" "<<sigma<<endl;
             //if(sigma%2==0) window=8*sigma+1;
             //else window=sigma*8;
             window=6*sigma1+1;
@@ -155,7 +162,8 @@ void blurComputationfromimage(string displayimage, string smoothimagepath, strin
 
         }
     }
-    writeImage<double,unsigned short>(gradImage,Xdim,Ydim,smoothimage,writeImagename);
+    fout.close();
+    writeImage<double,unsigned short>(gradImage,Xdim,Ydim,smoothimage,writeImagename,true);
 }
 
 void blurComputationfromfile(string displayimage,string writeImagename,string filename){
@@ -192,11 +200,12 @@ int main(int argc, char* argv[]) {
     string scaleimage;
     string smoothimagepath;
     basepath=string(argv[1]);
+    double sigdivisor=atof(argv[2]);
     cout<<"Original Image Name: ";
     cin>>displayimagefilename;
     string displayimage=basepath+displayimagefilename;
     string writeImagename=basepath+"smooth-"+displayimagefilename;
-
+    string outputfilename=basepath+"scaleList.txt";
     int selection;
     cout<<"1. read Blur Field from image\n";
     cout<<"2. read Blur Field from file\n";
@@ -209,7 +218,7 @@ int main(int argc, char* argv[]) {
         cout<<"Enter Blur Field Image Name: ";
         cin>>scaleimage;
         smoothimagepath=basepath+scaleimage;
-        blurComputationfromimage(displayimage,smoothimagepath,writeImagename);
+        blurComputationfromimage(displayimage,smoothimagepath,writeImagename,outputfilename,sigdivisor);
         break;
     case 3:
         uniformBlurring(displayimage,writeImagename);

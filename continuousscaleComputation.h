@@ -457,7 +457,7 @@ void compute_scale_Gradient_with_continuous_interpolation(unsigned short** arr,i
 
 
     CImg<long int> gradientjpgimage(Xdim,Ydim,1,1);
-    writeImage<double, long int>(gradImage,Rows,Cols,gradientjpgimage,gradientimagename);
+    writeImage<double, long int>(gradImage,Rows,Cols,gradientjpgimage,gradientimagename,true);
 
     gradient_color_Image(Gradientangle,gradImage,gradientcolorimagename,true);
 

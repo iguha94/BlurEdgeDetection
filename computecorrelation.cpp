@@ -15,7 +15,7 @@ int main(int argc, char* argv[]){
     string basePath=argv[1];
     string targetDirectory=argv[2];
 
-    for(int i=13;i<=15;i++){ //For each phantoms
+    for(int i=16;i<=16;i++){ //For each phantoms
 
         stringstream ss;
         ss << i;
@@ -47,7 +47,7 @@ int main(int argc, char* argv[]){
 
         cout<<"read True Blur values\n";
 
-        for(int j=0;j<3;j++){ //for each noise level
+        for(int j=2;j<3;j++){ //for each noise level
             string basedirectory=basePath+targetDirectory+"/Phantom"+id+"/"+NoiseLevel[j]+"/";
 
             string ezcomputedblurfile=basedirectory+"EZBlur"+Prefixid[j]+"_Phantom"+id+".txt";
@@ -59,13 +59,13 @@ int main(int argc, char* argv[]){
             ezwriter.open(ezcorrelationfile.c_str(),ios::out);
             ezwriter<<"X,Y,TrueBlur,AppliedBlur\n";
             while(ezhandler>>x>>y>>v){
-                if((x>2 && x<Ydim-2) && (y>2 && y<Xdim-2))
+                if((x>5 && x<Xdim-5) && (y>5 && y<Ydim-5))
                 ezwriter<<y<<","<<x<<","<<trueblurarr[y][x]<<","<<v<<"\n"; //x,y,trueblur,computedblur
             }
 
             ezhandler.close(); ezwriter.close();
 
-            string scalebasedcomputedblurfile=basedirectory+"scale-"+Prefix[j]+"-smooth-Phantom"+id+".tif";
+            /*string scalebasedcomputedblurfile=basedirectory+"scale-"+Prefix[j]+"-smooth-Phantom"+id+".tif";
             string scalebasededgefile=basedirectory+"scalebasededge_"+Prefix[j]+"-smooth-Phantom"+id+".tif";
             string scalebasedcorrelationfile=basedirectory+"ScaleCorr.csv";
 
@@ -83,13 +83,7 @@ int main(int argc, char* argv[]){
                 }
             }
 
-            /*cimg_forXY(computedscaleimage,x,y){
-                if(computededgeimage(x,y)>200){
-                    scalewriter<<x<<","<<y<<","<<trueblurarr[x][y]<<","<<((double)computedscaleimage(x,y)/2.0)<<"\n"; //x,y,trueblur,computedblur
-                }
-            }*/
-
-            scalewriter.close();
+            scalewriter.close();*/
 
         }
 

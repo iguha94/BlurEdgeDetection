@@ -14,10 +14,6 @@ using namespace cimg_library;
 
 int main(int argc, char* argv[]) {
 
-    //string logfile=basepath+"log.txt";
-    //logger.open(logfile.c_str());
-    //confidence=1.5*pow(10,-8);
-    //memconf=confidence;
     bool b=false;
     gaussvar=1;
     int kernelsize=3;
@@ -31,18 +27,7 @@ int main(int argc, char* argv[]) {
     basepath=string(argv[6]);
 
     basesig=gaussgradvar;
-    //cout<<"Enter membership value: ";
-    //cin>>memconf;
-
-    //cout<<"Enter the pixel of interest: ";
-    //cin>>Xc>>Yc;
-
-    //cout<<"Interrmediate Scale: ";
-    //cin>>intermediatescale;
-
-    //string sfname=basepath+"gradMap.txt";
-    //sout.open(sfname.c_str());
-
+   
     no_of_interpolating_points=3; //denotes the number of samples taken for each point, r,r-0.25,r+0.25
 
     imagefilename=basepath+curimagefile;
@@ -58,7 +43,7 @@ int main(int argc, char* argv[]) {
     Hysteresisimagename=basepath+"scalebasededge_"+curimagefile;
     secondderivativeimagename=basepath+"sd-"+curimagefile;
     localizedimagename=basepath+"Canny-"+curimagefile;
-    dialatedimagename=basepath+"dialated-"+curimagefile;
+    dialatedimagename=basepath+"softmax-"+curimagefile;
     dividorimagename=basepath+"dividor-"+curimagefile;
 
     CImg<unsigned short> jpgimage(imagefilename.c_str());

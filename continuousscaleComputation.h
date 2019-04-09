@@ -448,8 +448,10 @@ void compute_scale_Gradient_with_continuous_interpolation(unsigned short** arr,i
     cout<<"Computed Scale Variance\n";
 
     //FinaOptimalScaleforEdge(gradImage,Rows,Cols);
+
     smoothGradient(gradImage,Xdim,Ydim);
     cout<<"Gradient Smoothed\n";
+
     //computeScaleBasedGradient(arr);
 
     //CImg<unsigned short> scalearrjpgimage(Xdim,Ydim,1,1);
@@ -457,7 +459,7 @@ void compute_scale_Gradient_with_continuous_interpolation(unsigned short** arr,i
 
 
     CImg<long int> gradientjpgimage(Xdim,Ydim,1,1);
-    writeImage<double, long int>(gradImage,Rows,Cols,gradientjpgimage,gradientimagename,true);
+    writeImage<double, long int>(gradImage,Rows,Cols,gradientjpgimage,gradientimagename);
 
     gradient_color_Image(Gradientangle,gradImage,gradientcolorimagename,true);
 
@@ -474,7 +476,9 @@ void compute_scale_Gradient_with_continuous_interpolation(unsigned short** arr,i
         cin>>threshold;
         cout<<"Enter Non maxima suppression threshhold: ";
         cin>>threshold2;
-        SoftMaxComputation<double,double>(smoothgradImage,Gradientangle,maxgradient);
+        SoftMaxComputation<double,double>(smoothgradImage,Gradientangle,maxgradient); //if using smoothing use smoothgradImage else use gradImage
+        CImg<long int> softmaxjpgimage(Xdim,Ydim,1,1);
+        writeImage<double, long int>(softmax,Rows,Cols,softmaxjpgimage,dialatedimagename);
         //NonmaximaSuppression<double,double>(smoothgradImage,Gradientangle,threshold,threshold2);
         NonmaximaSuppression_Canny<double,double>(softmax,ScaleGradientNewX,ScaleGradientNewY,Gradientangle,threshold2);
         HysteresisThresholding(minThreshold,maxThreshold,Hysteresisimagename);

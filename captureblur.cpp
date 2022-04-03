@@ -12,6 +12,7 @@
 using namespace std;
 
 int main(int argc, char* argv[]){
+	string basepath="/Users/iguha/Documents/OneDrive - University of Iowa/Attachments/PhD/Journals/2019/Blur-Scale-Edge-Detection/Images/Data2_paper/";
     const unsigned char red[] = { 255,0,0 };
     string displayimagefilename(argv[1]);
 
@@ -28,7 +29,7 @@ int main(int argc, char* argv[]){
     cout<<"Xdim: "<<jpgimage.width()<<" Ydim: "<<jpgimage.height()<<"\n";
     CImg<unsigned short> circledimage(jpgimage.width(),jpgimage.height(),1,1,0); //create an RGB image of same dimension to draw the circle.
     ifstream file;
-    file.open("Points.txt");
+    file.open(basepath+"Points.txt");
     int x,y;
     while(file>>x>>y){
         circledimage.draw_circle(x,y,(float)(jpgimage(x,y)/2),red,1,1); //read the points in file and draw circles

@@ -13,10 +13,10 @@ unsigned short minimum(unsigned short a, unsigned short b) {return a>b?a:b;}
 double ComputeSigmoid(double val,double maximumval){
     double mid = maximumval/2.0;
     double gradval=val-mid;
-    gradval/=mid;
-    gradval*=5;
+    //gradval/=mid;
+    //gradval*=5;
 
-    double denom=1.0+exp(-fabs(gradval));
+    double denom=1.0+exp(-(gradval));
     double v=1/denom;
     if(gradval<0) return 1-v;
     return v;

@@ -196,15 +196,56 @@ void allocateMemory( int Rows, int Cols){
 }
 
 template<class T1,class T2>
-void writeImage(T1** arr, int Rows, int Cols,CImg<T2> cimg,string filename, bool isPrint=false){
+void writeImage(T1** arr, int Rows, int Cols,CImg<T2> cimg,string filename, bool isPrint=false,double multiplier=1){
+
     for(int i=0;i<Rows;i++){
         for(int j=0;j<Cols;j++){
             T2 value=(T2) arr[i][j];
+            if(value>0 && value<=1) value*=multiplier;
             cimg(i,j)=value;
         }
     }
 
     cimg.save_tiff(filename.c_str());
+    if(multiplier==3) {
+        ofstream fout;
+        string filepath=basepath+"softgrad.txt";
+        fout.open(filepath.c_str(), ios::out);
+        for (int l = 0; l < 41; l++) {
+            double value = arr[Xc + l][Yc+l];
+            //cout<<"Value: "<<value<<"\n";
+            fout<<value<<endl;
+
+        }
+        fout.close();
+    }
+
+    if(multiplier==4) {
+        ofstream fout;
+        string filepath=basepath+"scalegrad.txt";
+        fout.open(filepath.c_str(), ios::out);
+        for (int l = 0; l < 41; l++) {
+            double value = arr[Xc+l][Yc+l];
+            //cout<<"Value: "<<value<<"\n";
+            fout<<value<<endl;
+
+        }
+        fout.close();
+    }
+
+    if(multiplier==5) {
+        ofstream fout;
+        string filepath=basepath+"scale.txt";
+        fout.open(filepath.c_str(), ios::out);
+        for (int l = 0; l < 41; l++) {
+            double value = arr[Xc+l][Yc+l];
+            //cout<<"Value: "<<value<<"\n";
+            fout<<value<<endl;
+
+        }
+        fout.close();
+    }
+
     if(isPrint)
     cimg.display();
 }

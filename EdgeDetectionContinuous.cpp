@@ -25,6 +25,8 @@ int main(int argc, char* argv[]) {
     maxscale=atof(argv[4]);
     snr=atof(argv[5]);
     basepath=string(argv[6]);
+    Xc=atoi(argv[7]);
+    Yc=atoi(argv[8]);
 
     basesig=gaussgradvar;
    
@@ -32,19 +34,22 @@ int main(int argc, char* argv[]) {
 
     imagefilename=basepath+curimagefile;
     scaleimagename=basepath+"scale-"+curimagefile;
-    gradientimagename=basepath+"scale-gradient-"+curimagefile;
+    gradientimagename=basepath+"scale-gradient-"+curimagefile+".tif";
     gaussgradientimagename=basepath+"point-gradient-"+curimagefile;
     sordergradientimagename=basepath+"sogradient-"+curimagefile;
     sorderscaleimagename=basepath+"soscale-"+curimagefile;
     gradientcolorimagename=basepath+"scale-gradientcolor-"+curimagefile;
     gausscolorimagename=basepath+"point-gradient-color-"+curimagefile;
     localmaximaimagename=basepath+"localmaxima-"+curimagefile;
-    softlocalmaximaimagename=basepath+"softlocalmaxima-"+curimagefile;
+    softlocalmaximaimagename=basepath+"softlocalmaxima-"+curimagefile+".tif";
     Hysteresisimagename=basepath+"scalebasededge_"+curimagefile;
     secondderivativeimagename=basepath+"sd-"+curimagefile;
     localizedimagename=basepath+"Canny-"+curimagefile;
-    dialatedimagename=basepath+"softmax-"+curimagefile;
+    dialatedimagename=basepath+"softmax-"+curimagefile+".tif";
     dividorimagename=basepath+"dividor-"+curimagefile;
+
+    distributionfilename=basepath+"distribution.txt";
+    sout.open(distributionfilename.c_str(),ios::out);
 
     CImg<unsigned short> jpgimage(imagefilename.c_str());
     Xdim=jpgimage.width();

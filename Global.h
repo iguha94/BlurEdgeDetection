@@ -162,6 +162,8 @@ string dialatedimagename;
 string dividorimagename;
 string secondderivativeimagename;
 string softlocalmaximaimagename;
+string distributionfilename;
+
 int maxscale;
 double ncount;
 vector<double> percentile;

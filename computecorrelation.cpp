@@ -15,7 +15,7 @@ int main(int argc, char* argv[]){
     string basePath=argv[1];
     string targetDirectory=argv[2];
 
-    for(int i=16;i<=16;i++){ //For each phantoms
+    for(int i=1;i<=15;i++){ //For each phantoms
 
         stringstream ss;
         ss << i;
@@ -47,10 +47,10 @@ int main(int argc, char* argv[]){
 
         cout<<"read True Blur values\n";
 
-        for(int j=2;j<3;j++){ //for each noise level
+        for(int j=0;j<3;j++){ //for each noise level
             string basedirectory=basePath+targetDirectory+"/Phantom"+id+"/"+NoiseLevel[j]+"/";
 
-            string ezcomputedblurfile=basedirectory+"EZBlur"+Prefixid[j]+"_Phantom"+id+".txt";
+            /*string ezcomputedblurfile=basedirectory+"EZBlur"+Prefixid[j]+"_Phantom"+id+".txt";
             string ezcorrelationfile=basedirectory+"EZCorr.csv";
 
             fstream ezhandler;
@@ -63,9 +63,9 @@ int main(int argc, char* argv[]){
                 ezwriter<<y<<","<<x<<","<<trueblurarr[y][x]<<","<<v<<"\n"; //x,y,trueblur,computedblur
             }
 
-            ezhandler.close(); ezwriter.close();
+            ezhandler.close(); ezwriter.close();*/
 
-            /*string scalebasedcomputedblurfile=basedirectory+"scale-"+Prefix[j]+"-smooth-Phantom"+id+".tif";
+            string scalebasedcomputedblurfile=basedirectory+"scale-"+Prefix[j]+"-smooth-Phantom"+id+".tif";
             string scalebasededgefile=basedirectory+"scalebasededge_"+Prefix[j]+"-smooth-Phantom"+id+".tif";
             string scalebasedcorrelationfile=basedirectory+"ScaleCorr.csv";
 
@@ -83,7 +83,7 @@ int main(int argc, char* argv[]){
                 }
             }
 
-            scalewriter.close();*/
+            scalewriter.close();
 
         }
 

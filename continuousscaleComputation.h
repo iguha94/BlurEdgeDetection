@@ -228,18 +228,18 @@ void VarianceofScale(){
 }
 
 void smoothGradient(double** arr, int Rows, int Cols){
-   for(int i=1;i<Rows-1;i++){
-	for(int j=1;j<Cols-1;j++){
-		double val=0;
-		for(int x=-1;x<=1;x++){
-			for(int y=-1;y<=1;y++){
-			   val+=arr[x+i][y+j];
-			}
-		}
-		smoothgradImage[i][j]=val/9.0;
-	}
-	}
-	
+    for(int i=1;i<Rows-1;i++){
+        for(int j=1;j<Cols-1;j++){
+            double val=0;
+            for(int x=-1;x<=1;x++){
+                for(int y=-1;y<=1;y++){
+                    val+=arr[x+i][y+j];
+                }
+            }
+            smoothgradImage[i][j]=val/9.0;
+        }
+    }
+
 }
 
 double getInterpolatedGradientX(double x, double y, int Rows, int Cols, int index){
@@ -366,17 +366,14 @@ void draw_continuous_scale(unsigned short** arr, int xc, int yc, int Rows, int C
                 +0.5*weight_gradient_matrix[scale][totalpoints][2][1];
         double Gradmag=squareroot<double>(gradXcomp/2,gradYcomp/2);
         percentile.push_back(Gradmag);
-        curgrad+=Gradmag;
-        //if(Gradmag<minimumGradient) minimumGradient=Gradmag;
-        // W        | if(xc==Xc && yc==Yc){
-        // R        |   double avgx=weight_gradient_matrix[scale][totalpoints][0][0]+weight_gradient_matrix[scale][totalpoints][1][0]+weight_gradient_matrix[scale][totalpoints][2][0];
-        // O        |   avgx/=3;
-        // N        |   double avgy=weight_gradient_matrix[scale][totalpoints][0][1]+weight_gradient_matrix[scale][totalpoints][1][1]+weight_gradient_matrix[scale][totalpoints][2][1];
-        // G        |   avgy/=3;
-        // Weight   |       //sout<<curx0<<" "<<cury0<<" "<<weight_gradient_matrix[scale][totalpoints][0][0]<<" "<<weight_gradient_matrix[scale][totalpoints][0][1]<<" "<<scale<<endl;
-        // Not there|           sout<<curx1<<" "<<cury1<<" "<<avgx<<" "<<avgy<<" "<<scale<<endl;
-        //            //sout<<curx0<<" "<<cury0<<" "<<weight_gradient_matrix[scale][totalpoints][2][0]<<" "<<weight_gradient_matrix[scale][totalpoints][2][1]<<" "<<scale<<endl;
-        //        }
+        //curgrad+=Gradmag;
+        if(Gradmag<minimumGradient) minimumGradient=Gradmag;
+
+        if(xc==Xc && yc==Yc){
+            double avgx=gradXcomp/2.0;
+            double avgy=gradYcomp/2.0;
+            sout<<xc<<" "<<yc<<" "<<avgx<<" "<<avgy<<" "<<scale<<endl;
+        }
 
         totalpoints+=1;
     }
@@ -432,36 +429,23 @@ void compute_scale_Gradient_with_continuous_interpolation(unsigned short** arr,i
             else { gradImage[i][j]/=(prevcount); gradImage[i][j]*=(2*scale);}
 
             //if(scale==maxscale) gradImage[i][j]/=(2*scale);
-            gradImage[i][j]+=gradientImage[i][j];
+            //gradImage[i][j]+=gradientImage[i][j];
             if(gradImage[i][j]>maxgradient) maxgradient=gradImage[i][j];
-            //Gradientangle[i][j]=computeAngle(ScaleGradientX[i][j],ScaleGradientY[i][j]);
+            Gradientangle[i][j]=computeAngle(ScaleGradientX[i][j],ScaleGradientY[i][j]);
         }
     }
-
+    cout<<"Max Gradient: "<<maxgradient<<endl;
+    gradient_color_Image(Gradientangle,gradImage,gradientcolorimagename,false);
     CImg<unsigned short> scalejpgimage(Xdim,Ydim,1,1);
-    writeImage<double, unsigned short>(ReliableScale,Rows,Cols,scalejpgimage,scaleimagename,true);
-    //DialateScale(percent);
-    //OptimizeScale();
-    //MaxmizeScale();
+    writeImage<double, unsigned short>(ReliableScale,Rows,Cols,scalejpgimage,scaleimagename,false); //use 4
 
-    VarianceofScale();
-    cout<<"Computed Scale Variance\n";
-
-    //FinaOptimalScaleforEdge(gradImage,Rows,Cols);
-
-    smoothGradient(gradImage,Xdim,Ydim);
-    cout<<"Gradient Smoothed\n";
-
-    //computeScaleBasedGradient(arr);
-
-    //CImg<unsigned short> scalearrjpgimage(Xdim,Ydim,1,1);
-    //writeImage<double, unsigned short>(Dividorarr,Rows,Cols,scalearrjpgimage,"carimage.jpg",false);
-
+    smoothGradient(gradImage,Xdim,Ydim); //uncomment
+    //cout<<"Gradient Smoothed\n";
 
     CImg<long int> gradientjpgimage(Xdim,Ydim,1,1);
-    writeImage<double, long int>(gradImage,Rows,Cols,gradientjpgimage,gradientimagename);
+    writeImage<double, long int>(gradImage,Rows,Cols,gradientjpgimage,gradientimagename,false); //use 5
 
-    gradient_color_Image(Gradientangle,gradImage,gradientcolorimagename,true);
+
 
     int flag=1;
     double maxThreshold,minThreshold,threshold,threshold2;
@@ -472,14 +456,13 @@ void compute_scale_Gradient_with_continuous_interpolation(unsigned short** arr,i
     while(flag==1){
         cout<<"Enter Lower and Higher Hysteresis Threshold: ";
         cin>>minThreshold>>maxThreshold;
-        cout<<"Enter Variance threshhold: ";
-        cin>>threshold;
-        cout<<"Enter Non maxima suppression threshhold: ";
-        cin>>threshold2;
+        //cout<<"Enter Variance threshhold: ";
+        //cin>>threshold;
+        //cout<<"Enter Non maxima suppression threshold: ";
+        //cin>>threshold2;
+        threshold=0;threshold2=0;
         SoftMaxComputation<double,double>(smoothgradImage,Gradientangle,maxgradient); //if using smoothing use smoothgradImage else use gradImage
-        CImg<long int> softmaxjpgimage(Xdim,Ydim,1,1);
-        writeImage<double, long int>(softmax,Rows,Cols,softmaxjpgimage,dialatedimagename);
-        //NonmaximaSuppression<double,double>(smoothgradImage,Gradientangle,threshold,threshold2);
+        gradient_color_Image(Gradientangle,softmax,dialatedimagename,false);
         NonmaximaSuppression_Canny<double,double>(softmax,ScaleGradientNewX,ScaleGradientNewY,Gradientangle,threshold2);
         HysteresisThresholding(minThreshold,maxThreshold,Hysteresisimagename);
         cout<<"Press 0 to terminate else press 1. \n";

@@ -196,7 +196,7 @@ void circularDistribution(double meanx, double meany,double stdx, double stdy, d
     covxy*=covmult;
     for(double x=0;x<dimx;x+=1){
         for(double y=0;y<dimy;y+=1){
-            cout<<"Processed: "<<x<< " , "<<y<<endl;
+            //cout<<"Processed: "<<x<< " , "<<y<<endl;
             double gaussval=multivariateGaussian(x,y,meanx,meany,stdx,stdy,covxy);
             int* color=getcolorMappingfordistribution(1,(1-gaussval));
             rgb(x,y,0,0)=color[0];
@@ -205,9 +205,9 @@ void circularDistribution(double meanx, double meany,double stdx, double stdy, d
         }
     }
 
-    rgb(200,200,0,0)=0;
-    rgb(200,200,0,1)=255;
-    rgb(200,200,0,2)=0;
+    rgb(xs,ys,0,0)=255;
+    rgb(xs,ys,0,1)=255;
+    rgb(xs,ys,0,2)=255;
 
     vector<dataPoint>::iterator it;
 if(putpoints){
@@ -226,50 +226,61 @@ if(putpoints){
     rgb.display();
     rgb.save_tiff(output.c_str());
 
-    CImg<unsigned short> grayscale=convert_to_gray_scale_from_red(rgb,rgb.width(),rgb.height());
-    grayscale.display();
-    grayscale.save_tiff(grayoutput.c_str());
+//    CImg<unsigned short> grayscale=convert_to_gray_scale_from_red(rgb,rgb.width(),rgb.height());
+//    grayscale.display();
+//    grayscale.save_tiff(grayoutput.c_str());
 }
 
-main(){
+main(int argc,char* argv[]){
     string filename;
     double scale;
     double angle;
     int putpoints;
     vector<dataPoint> pointvector;
     vector<dataPoint> finalpointvector;
-    cout<<"Imagename: ";
-    cin>>oimagename;
-    cout<<"File name: ";
-    cin>>filename;
+    basepath=string(argv[1]);
+    oimagename=string(argv[2]);
+    filename=string(argv[3]);
+    scale=atoi(argv[4]);
+    putpoints=atoi(argv[5]);
+    //cout<<"Imagename: ";
+    //cin>>oimagename;
+    //cout<<"File name: ";
+    //cin>>filename;
 
-    cout<<"intermediate scale value: ";
-    cin>>scale;
-    cout<<"Want to draw points (1 or 0): ";
-    cin>>putpoints;
+    //cout<<"intermediate scale value: ";
+    //cin>>scale;
+    //cout<<"Want to draw points (1 or 0): ";
+    //cin>>putpoints;
     cout<<"Mean Scale: "<<scale<<endl;
 
-    double nscale=scale/2;
+    double nscale=scale;///2;
 
     string filepath=basepath+filename;
     ifstream fin;
     fin.open(filepath.c_str());
 
-    double x, y, gradx, grady,meanx, meany, stdx, stdy,covxy;
+    double x, y, gradx, grady, stdx, stdy,covxy;
+    double meanx=0;double meany=0;
+    double pvcnt=0;
     double r;
     double minx=INT_MAX,miny=INT_MAX;
     double maxx=INT_MIN,maxy=INT_MIN;
     while(fin>> x>> y>> gradx>> grady>> r){
         //cout<<x<<","<<y<<","<<gradx<<","<<grady<<","<<r<<endl;
         dataPoint dp(x,y,gradx,grady,r,0);
-        if(scale>=r)
+        if(scale>=r){
             pointvector.push_back(dp);
+            meanx+=gradx;
+            meany+=grady;
+            pvcnt++;
+        }
         else if(scale+1==r){
             finalpointvector.push_back(dp);
         }
-        if(x==-1 && y==-1 && nscale==r) {
-            meanx=gradx;meany=grady;
-        }
+       // if(x==-1 && y==-1 && nscale==r) {
+       //     meanx=gradx;meany=grady;
+       // }
 
         if(gradx<minx) minx=gradx;
         if(gradx>maxx) maxx=gradx;
@@ -277,7 +288,7 @@ main(){
         if(grady<miny) miny=grady;
         if(grady>maxy) maxy=grady;
     }
-
+    meanx/=pvcnt;meany/=pvcnt;
     cout<<meanx<<" :mean: "<<meany<<endl;
     double size=pointvector.size();
     vector<dataPoint>::iterator it;
@@ -289,6 +300,7 @@ main(){
         stdy+=(meany-p.grady)*(meany-p.grady);
         covxy+=(meanx-p.gradx)*(meany-p.grady);
     }
+    cout<<"Covariance: "<<covxy<<endl;
     stdx=sqrt(stdx/size);
     stdy=sqrt(stdy/size);
     covxy/=size;

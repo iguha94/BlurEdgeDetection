@@ -24,43 +24,43 @@ sheet1=wb.add_sheet('SNR6')
 sheet2=wb.add_sheet('SNR12')
 sheet3=wb.add_sheet('SNR18')
 
-sheet1.write(0,0,'Phantom ID')
-sheet1.write(0,1,'EZ Correlation')
-sheet1.write(0,2,'ScaleBased Correlation')
-sheet1.write(0,3,'EZ Mean True Blur')
-sheet1.write(0,4,'EZ Mean Computed Blur')
-sheet1.write(0,5,'ScaleBased Mean True Blur')
-sheet1.write(0,6,'ScaleBased Mean Computed Blur')
-sheet1.write(0,7,'EZ Noise stdv')
-sheet1.write(0,8,'ScaleBased Noise stdv')
-sheet1.write(0,9,'EZ Kernel stdv')
-sheet1.write(0,10,'ScaleBased Kernel stdv')
+sheet1.write(0,0,'Phantom_ID')
+sheet1.write(0,1,'EZ_Correlation')
+sheet1.write(0,2,'ScaleBased_Correlation')
+sheet1.write(0,3,'EZ_Mean_True_Blur')
+sheet1.write(0,4,'EZ_Mean_omputed_Blur')
+sheet1.write(0,5,'ScaleBased_Mean_True Blur')
+sheet1.write(0,6,'ScaleBased_Mean_Computed_Blur')
+sheet1.write(0,7,'EZ_CCC')
+sheet1.write(0,8,'ScaleBased_CCC')
+sheet1.write(0,9,'EZ_Kernel_stdv')
+sheet1.write(0,10,'ScaleBased_Kernel_stdv')
 sheet1.write(0,11,'Canny Kernel stdv')
 
-sheet2.write(0,0,'Phantom ID')
-sheet2.write(0,1,'EZ Correlation')
-sheet2.write(0,2,'ScaleBased Correlation')
-sheet2.write(0,3,'EZ Mean True Blur')
-sheet2.write(0,4,'EZ Mean Computed Blur')
-sheet2.write(0,5,'ScaleBased Mean True Blur')
-sheet2.write(0,6,'ScaleBased Mean Computed Blur')
-sheet2.write(0,7,'EZ Noise stdv')
-sheet2.write(0,8,'ScaleBased Noise stdv')
-sheet2.write(0,9,'EZ Kernel stdv')
-sheet2.write(0,10,'ScaleBased Kernel stdv')
+sheet2.write(0,0,'Phantom_ID')
+sheet2.write(0,1,'EZ_Correlation')
+sheet2.write(0,2,'ScaleBased_Correlation')
+sheet2.write(0,3,'EZ_Mean_True_Blur')
+sheet2.write(0,4,'EZ_Mean_omputed_Blur')
+sheet2.write(0,5,'ScaleBased_Mean_True Blur')
+sheet2.write(0,6,'ScaleBased_Mean_Computed_Blur')
+sheet2.write(0,7,'EZ_CCC')
+sheet2.write(0,8,'ScaleBased_CCC')
+sheet2.write(0,9,'EZ_Kernel_stdv')
+sheet2.write(0,10,'ScaleBased_Kernel_stdv')
 sheet2.write(0,11,'Canny Kernel stdv')
 
-sheet3.write(0,0,'Phantom ID')
-sheet3.write(0,1,'EZ Correlation')
-sheet3.write(0,2,'ScaleBased Correlation')
-sheet3.write(0,3,'EZ Mean True Blur')
-sheet3.write(0,4,'EZ Mean Computed Blur')
-sheet3.write(0,5,'ScaleBased Mean True Blur')
-sheet3.write(0,6,'ScaleBased Mean Computed Blur')
-sheet3.write(0,7,'EZ Noise stdv')
-sheet3.write(0,8,'ScaleBased Noise stdv')
-sheet3.write(0,9,'EZ Kernel stdv')
-sheet3.write(0,10,'ScaleBased Kernel stdv')
+sheet3.write(0,0,'Phantom_ID')
+sheet3.write(0,1,'EZ_Correlation')
+sheet3.write(0,2,'ScaleBased_Correlation')
+sheet3.write(0,3,'EZ_Mean_True_Blur')
+sheet3.write(0,4,'EZ_Mean_omputed_Blur')
+sheet3.write(0,5,'ScaleBased_Mean_True Blur')
+sheet3.write(0,6,'ScaleBased_Mean_Computed_Blur')
+sheet3.write(0,7,'EZ_CCC')
+sheet3.write(0,8,'ScaleBased_CCC')
+sheet3.write(0,9,'EZ_Kernel_stdv')
+sheet3.write(0,10,'ScaleBased_Kernel_stdv')
 sheet3.write(0,11,'Canny Kernel stdv')
 
 for i in range(1,16):
@@ -86,9 +86,22 @@ for i in range(1,16):
         correlation=pearsonr(X,Y)
         corr=correlation[0]
         print('EZcorrel: ',round(corr,2))
+
+        meanx=np.mean(X)
+        stdvx=np.std(X)
+        meany=np.mean(Y)
+        stdvy=np.std(Y)
+
+        numerator = 2*corr*stdvx*stdvy
+        denominator = pow(stdvx,2)+pow(stdvy,2)+pow((meanx-meany),2)
+        ccc=numerator/denominator
+
+        print('EZ CCC: ',round(ccc,2))
+
         sheet.write(i,1,round(corr,2))
         sheet.write(i,3,round(np.mean(X),2))
         sheet.write(i,4,round(np.mean(Y),2))
+        sheet.write(i,7,round(ccc,2))
         
         dataListA=[]
         dataListB=[]
@@ -105,11 +118,24 @@ for i in range(1,16):
         correlation=pearsonr(X,Y)
         corr=correlation[0]
         print('Scalecorrel: ',round(corr,2))
+
+        meanx=np.mean(X)
+        stdvx=np.std(X)
+        meany=np.mean(Y)
+        stdvy=np.std(Y)
+
+        numerator = 2*corr*stdvx*stdvy
+        denominator = pow(stdvx,2)+pow(stdvy,2)+pow((meanx-meany),2)
+        ccc=numerator/denominator
+
+        print('scale CCC: ',round(ccc,2))
+
         sheet.write(i,2,round(corr,2))
         sheet.write(i,5,round(np.mean(X),2))
         sheet.write(i,6,round(np.mean(Y),2))
+        sheet.write(i,8,round(ccc,2))
     
-wb.save(basepath+'CorrelationAll15.xls')
+wb.save(basepath+'ConcordCorrelationAll15.xls')
         
         
         

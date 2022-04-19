@@ -1,5 +1,8 @@
+build/
 .Rhistory
 .idea/
+.vscode/
+*.tif
 *.png
 *.jpg
 *.jpeg

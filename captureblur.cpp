@@ -12,6 +12,7 @@
 using namespace std;
 
 int main(int argc, char* argv[]){
+	string basepath="/Users/iguha/Documents/OneDrive - University of Iowa/Attachments/PhD/Journals/2019/Blur-Scale-Edge-Detection/Images/Data2_paper/";
     const unsigned char red[] = { 255,0,0 };
     string basepath(argv[1]);
     string displayimagefilename(argv[2]);

@@ -122,7 +122,7 @@ int itkBSplineScatteredDataPointSetToImageFilterTest1(string inputimage, string 
     return EXIT_SUCCESS;
 }
 
-int main( )
+int main(int argc, char* argv[])
 {
     string inputimage,outputimage;
     cout<<"Enter Input Image: ";

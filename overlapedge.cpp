@@ -44,14 +44,15 @@ void ImposeonRGBImage(string imagename, string skeletonname){
     Ydim=RGBimage.height();
     CImg<unsigned short> skeljpgimage(skeletonname.c_str());
     cimg_forXY(skeljpgimage,x,y){
-        if(skeljpgimage(x,y)>0){
+        if(x>1 && y>1 && x<Xdim-2 && y<Ydim-2 && skeljpgimage(x,y)>200)
+        {
             RGBimage(x,y,0,0)=(r);
             RGBimage(x,y,0,1)=(g);
             RGBimage(x,y,0,2)=(b);
         }
     }
     RGBimage.save_tiff(rgb_image_name.c_str());
-    //RGBimage.display();
+    RGBimage.display();
 }
 
 int main(int argc, char*argv[]){

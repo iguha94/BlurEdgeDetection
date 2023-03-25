@@ -124,17 +124,15 @@ int itkBSplineScatteredDataPointSetToImageFilterTest1(string inputimage, string 
 
 int main(int argc, char* argv[])
 {
-    string inputimage,outputimage;
-    cout<<"Enter Input Image: ";
-    cin>>inputimage;
-    cout<<"Output Image: ";
-    cin>>outputimage;
-    string basepath="/nfs/s-l011/local/vol01/i/iguha/Documents/Phd-iguha/Imagesfortesting/ECCV/QA/";
-    inputimage=basepath+inputimage;
-    outputimage=basepath+outputimage;
-    string outputfilename=basepath+"scaleList.txt";
+    string inputimage=string(argv[1]);
+    string outputimage=string(argv[2]);
+    string outputfilename=string(argv[3]);
+    //string basepath="/nfs/s-l011/local/vol01/i/iguha/Documents/Phd-iguha/Imagesfortesting/ECCV/QA/";
+    //inputimage=basepath+inputimage;
+    //outputimage=basepath+outputimage;
+    //string outputfilename=basepath+"scaleList.txt";
     bool test1 = itkBSplineScatteredDataPointSetToImageFilterTest1( inputimage,outputimage,outputfilename );
 
-    return ( test1  );
+    return 0;
 }
 
